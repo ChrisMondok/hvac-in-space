@@ -30,3 +30,5 @@ Game.prototype.resizeCanvas = function() {
 	this.canvas.setAttribute("width", this.canvas.offsetWidth);
 	this.canvas.setAttribute("height", this.canvas.offsetHeight);
 }
+
+Game.prototype.CONSTANT_OF_GRAVITY = 1;
