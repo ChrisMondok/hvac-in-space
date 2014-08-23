@@ -25,6 +25,8 @@ Game.prototype.tick = function() {
 	var dt = now - this.lastTick;
 
 	this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+	this.ctx.fillStyle = "black";
+	this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
 	for(var i = 0; i < this.pawns.length; i++) {
 		this.pawns[i].tick(dt);
