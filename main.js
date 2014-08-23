@@ -29,3 +29,28 @@ function extend(base, constructor) {
 	}
 	return constructor;
 }
+
+function MixInto(destination, mixin) {
+	var mixInFunction = function(name) {
+		console.log("Mixing in function named "+name);
+		var ownProperty = destination[property];
+		destination[name] = function() {
+			ownProperty.apply(this, arguments);
+			mixin.prototype[name].apply(this, arguments);
+		};
+	}
+
+	for(var property in mixin.prototype) {
+		if(!mixin.prototype.hasOwnProperty(property))
+			continue;
+
+		if(property in destination) {
+			if(destination[property] instanceof Function)
+				mixInFunction(property);
+			else
+				console.warn("Not overwriting "+property);
+		}
+		else
+			destination[property] = mixin.prototype[property];
+	}
+}

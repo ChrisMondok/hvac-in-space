@@ -1,5 +1,6 @@
 var Ship = extend(Pawn, function Ship() {Pawn.apply(this, arguments)});
-Ship.prototype.NODE_DISTANCE = 20;
+
+Ship.prototype.NODE_DISTANCE = 120;
 
 Ship.prototype.nodes = [];
 
@@ -28,12 +29,10 @@ Ship.prototype.tick = function(dt) {
 		this.distanceSinceLastNode += dist;
 
 		if(this.distanceSinceLastNode >= this.NODE_DISTANCE){
-			this.nodes.push(new Node(game, this.x, this.y));
+			this.nodes.push(new RopeSegment(game, this.x, this.y));
 			this.distanceSinceLastNode = 0;
 		}
 
-		console.log(this.distanceTraveled);
-	
 	} else {
 
 		this.angle = this.planetAngle + this.planet.angle;
@@ -48,11 +47,6 @@ Ship.prototype.draw = function(dt) {
 	this.game.ctx.drawImageRotated(this.image, this.x, this.y, this.angle);
 }
 
-Ship.prototype.attachToPlanet = function(planet) {
-	this.planet = planet;
-	this.velocity = {x:0, y:0};
-}
-
 Ship.prototype.fire = function(targetVelocity) {
 
 	if(this.planet == undefined)
@@ -64,3 +58,5 @@ Ship.prototype.fire = function(targetVelocity) {
 	var force = {x:targetVelocity * Math.cos(this.angle) * this.mass, y:targetVelocity * Math.sin(this.angle) * this.mass};
 	this.addForce(force);
 }
+
+MixInto(Ship.prototype, Attachable);

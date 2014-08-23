@@ -1,6 +1,6 @@
-var Node = extend(Pawn);
+var RopeSegment = extend(Pawn, function RopeSegment(){Pawn.apply(this, arguments)});
 
-Node.prototype.draw = function(dt) {
+RopeSegment.prototype.draw = function(dt) {
 	Pawn.prototype.draw.call(this, dt);
 	var ctx = this.game.ctx;
 	ctx.beginPath();
