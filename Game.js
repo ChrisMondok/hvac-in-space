@@ -120,4 +120,8 @@ Game.prototype.resizeCanvas = function() {
 	this.canvas.setAttribute('height', this.canvas.offsetHeight);
 }
 
+Game.prototype.getPlanets = function() {
+	return this.instances[Planet.name];
+}
+
 Game.prototype.CONSTANT_OF_GRAVITY = 1;
