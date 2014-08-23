@@ -25,3 +25,17 @@ Planet.prototype.distanceTo = function(otherPlanet) {
 Planet.prototype.directionTo = function(otherPlanet) {
 	return Math.atan2( otherPlanet.y - this.y, otherPlanet.x - this.x );
 }
+
+Planet.prototype.orbitBody = function(otherBody, clockwise) {
+	
+	var targetVelocity = Math.sqrt( game.CONSTANT_OF_GRAVITY * (this.mass + otherBody.mass) / this.distanceTo(otherBody));
+	var forceDirection = this.directionTo(otherBody);
+	if(clockwise)
+		forceDirection += Math.PI/2;
+	else
+		forceDirection -= Math.PI/2;
+
+	var force = {x:targetVelocity * Math.cos(forceDirection) * this.mass, y:targetVelocity * Math.sin(forceDirection) * this.mass};
+	this.addForce(force);
+	otherBody.addForce({x:force.x * -1, y:force.y * -1});
+}
