@@ -4,6 +4,10 @@ Planet.prototype.mass = 1000;
 
 Planet.prototype.image = images.bluePlanet;
 
+Planet.prototype.rotationAngle = 0;
+
+Planet.prototype.radius = 100;
+
 Planet.prototype.getGravity = function(otherPlanet) {
 	if(!(this.mass && otherPlanet.mass))
 		throw new RangeError("Both bodies must have mass!");
