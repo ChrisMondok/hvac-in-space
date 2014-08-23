@@ -5,6 +5,8 @@ Planet.prototype.mass = 1000;
 Planet.prototype.image = images.bluePlanet;
 
 Planet.prototype.getGravity = function(otherPlanet) {
+	if(!(this.mass && otherPlanet.mass))
+		throw new RangeError("Both bodies must have mass!");
 
 	var magnitude =  this.game.CONSTANT_OF_GRAVITY * (this.mass * otherPlanet.mass) / Math.pow(this.distanceTo(otherPlanet),2);
 	var direction = this.directionTo(otherPlanet);
