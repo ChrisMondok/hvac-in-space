@@ -9,7 +9,7 @@ function Pawn(game, x, y) {
 	this.velocity = {x: 0, y: 0};
 	this.angle = 0;
 
-	this.game.pawns.push(this);
+	this.game.addPawn(this);
 }
 
 Pawn.prototype.angularVelocity = 0;
@@ -25,10 +25,20 @@ Pawn.prototype.draw = function(dt) {
 }
 
 Pawn.prototype.destructor = function() {
-	this.game.pawns.splice(this.game.pawns.indexOf(this), 1);
+	this.game.removePawn(this);
+}
+
+Pawn.prototype.distanceTo = function(otherPlanet) {
+	return Math.sqrt(Math.pow(this.x - otherPlanet.x, 2) + Math.pow(this.y - otherPlanet.y, 2)); 
+}
+
+Pawn.prototype.directionTo = function(otherPlanet) {
+	return Math.atan2( otherPlanet.y - this.y, otherPlanet.x - this.x );
 }
 
 Pawn.prototype.addForce = function(force) {
 	this.velocity.x += force.x / this.mass;
 	this.velocity.y += force.y / this.mass;
 }
+
+types[Pawn.name] = Pawn;

@@ -1,4 +1,4 @@
-var Planet = extend(Pawn);
+var Planet = extend(Pawn, function Planet() {Pawn.apply(this, arguments)});
 
 Planet.prototype.mass = 1000;
 
@@ -22,14 +22,6 @@ Planet.prototype.draw = function(dt) {
 	var ctx = this.game.ctx;
 	ctx.drawImageRotated(this.image, this.x, this.y, this.angle);
 	
-}
-
-Planet.prototype.distanceTo = function(otherPlanet) {
-	return Math.sqrt(Math.pow(this.x - otherPlanet.x, 2) + Math.pow(this.y - otherPlanet.y, 2)); 
-}
-
-Planet.prototype.directionTo = function(otherPlanet) {
-	return Math.atan2( otherPlanet.y - this.y, otherPlanet.x - this.x );
 }
 
 Planet.prototype.orbitBody = function(otherBody, clockwise) {

@@ -1,4 +1,4 @@
-var Ship = extend(Pawn);
+var Ship = extend(Pawn, function Ship() {Pawn.apply(this, arguments)});
 Ship.prototype.NODE_DISTANCE = 20;
 
 Ship.prototype.nodes = [];

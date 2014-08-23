@@ -15,9 +15,17 @@ function init() {
 
 window.addEventListener("load", init);
 
+var types = {};
+
 function extend(base, constructor) {
-	var newClass = constructor || function(){base.apply(this, arguments);};
-	newClass.prototype = Object.create(base.prototype);
-	if(constructor) newClass.prototype.constructor = constructor;
-	return newClass;
+	if(!constructor)
+		throw new TypeError("You need to provide a constructor");
+	//var newClass = constructor || function (){base.apply(this, arguments);};
+	constructor.prototype = Object.create(base.prototype);
+	constructor.prototype.constructor = constructor;
+	if(constructor.name) {
+		console.log("Defined "+constructor.name);
+		types[constructor.name] = constructor;
+	}
+	return constructor;
 }
