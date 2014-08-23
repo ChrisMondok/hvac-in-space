@@ -23,5 +23,5 @@ Planet.prototype.distanceTo = function(otherPlanet) {
 }
 
 Planet.prototype.directionTo = function(otherPlanet) {
-	return Math.atan2( otherPlanet.y - this.y, this.x - otherPlanet.x);
+	return Math.atan2( otherPlanet.y - this.y, otherPlanet.x - this.x );
 }
