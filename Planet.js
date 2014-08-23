@@ -8,12 +8,12 @@ Planet.prototype.radius = 100;
 
 Planet.prototype.getGravity = function(dt, otherPlanet) {
 	if(!(this.mass && otherPlanet.mass))
-		throw new RangeError("Both bodies must have mass!");
+		throw new RangeError('Both bodies must have mass!');
 
 	var magnitude =  dt * this.game.CONSTANT_OF_GRAVITY * (this.mass * otherPlanet.mass) / Math.pow(this.distanceTo(otherPlanet),2);
 	var direction = this.directionTo(otherPlanet);
 
-	return {y:magnitude * Math.sin(direction), x:magnitude * Math.cos(direction)}
+	return PolarToRectangular(direction, magnitude);
 }
 
 Planet.prototype.draw = function(dt) {
@@ -21,7 +21,6 @@ Planet.prototype.draw = function(dt) {
 
 	var ctx = this.game.ctx;
 	ctx.drawImageRotated(this.image, this.x, this.y, this.angle);
-	
 }
 
 Planet.prototype.orbitBody = function(otherBody, clockwise) {

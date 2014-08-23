@@ -9,7 +9,7 @@ if(!window.requestAnimationFrame)
 CanvasRenderingContext2D.prototype.drawImageRotated = function(image, x, y, angle) {
 	this.save();
 	this.translate(x, y);
-	this.rotate(angle);
+	this.rotate(-angle);
 	this.drawImage(image, -image.width/2, -image.height/2);
 	this.restore();
 }

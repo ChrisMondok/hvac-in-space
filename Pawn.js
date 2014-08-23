@@ -12,6 +12,8 @@ function Pawn(game, x, y) {
 	this.game.addPawn(this);
 }
 
+Pawn.prototype.mass = 1;
+
 Pawn.prototype.angularVelocity = 0;
 
 Pawn.prototype.tick = function(dt) {
@@ -33,7 +35,7 @@ Pawn.prototype.distanceTo = function(otherPlanet) {
 }
 
 Pawn.prototype.directionTo = function(otherPlanet) {
-	return Math.atan2( otherPlanet.y - this.y, otherPlanet.x - this.x );
+	return RectangularToPolar(otherPlanet.x - this.x, otherPlanet.y - this.y);
 }
 
 Pawn.prototype.addForce = function(force) {

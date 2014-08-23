@@ -25,7 +25,7 @@ function ShipTest() {
 
 	earth.angularVelocity = 0.13;
 
-	ship = new Ship(game);
+	ship = new Ship(game, 100, 600);
 	window.ship = ship;
 
 	ship.attachTo(earth);

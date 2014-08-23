@@ -1,6 +1,6 @@
 var Ship = extend(Pawn, function Ship() {Pawn.apply(this, arguments)});
 
-Ship.prototype.NODE_DISTANCE = 120;
+Ship.prototype.NODE_DISTANCE = 12;
 
 Ship.prototype.nodes = [];
 
@@ -8,7 +8,7 @@ Ship.prototype.planet = undefined;
 
 Ship.prototype.planetAngle = 0;
 Ship.prototype.angle = 0;
-Ship.prototype.mass = 10;
+Ship.prototype.mass = 1;
 
 Ship.prototype.distanceTraveled = 0;
 Ship.prototype.distanceSinceLastNode = 0;
@@ -16,11 +16,9 @@ Ship.prototype.distanceSinceLastNode = 0;
 Ship.prototype.image = images.ship;
 
 Ship.prototype.tick = function(dt) {
+	Pawn.prototype.tick.call(this,dt);
 
-		Pawn.prototype.tick.call(this,dt);
-
-	if(this.planet == undefined){
-
+	if(!this.anchor){
 		var dx = this.velocity.x * dt;
 		var dy = this.velocity.y * dt;
 
@@ -33,14 +31,27 @@ Ship.prototype.tick = function(dt) {
 			this.distanceSinceLastNode = 0;
 		}
 
-	} else {
-
-		this.angle = this.planetAngle + this.planet.angle;
-		this.x = this.planet.x + (Math.cos(this.angle) * this.planet.radius);
-		this.y = this.planet.y + (Math.sin(this.angle) * this.planet.radius);
-
+		this.beAffectedByGravity(dt);
 	}
 }
+
+Ship.prototype.beAffectedByGravity = function(dt) {
+	var planets = game.instances[Planet.name];
+	var force = {x: 0, y: 0};
+	
+	for(var i = 0; i < planets.length; i++) {
+		var magnitude = dt * (game.CONSTANT_OF_GRAVITY * planets[i].mass)/Math.pow(planets[i].distanceTo(this), 2);
+		var direction = this.directionTo(planets[i]);
+		
+		var rect = PolarToRectangular(direction, magnitude);
+		force.x += rect.x;
+		force.y += rect.y;
+	}
+
+	//this works because we're treating mass as 1. I think.
+	this.velocity.x += force.x;
+	this.velocity.y += force.y;
+};
 
 Ship.prototype.draw = function(dt) {
 	Pawn.prototype.draw.call(this, dt);
@@ -48,17 +59,11 @@ Ship.prototype.draw = function(dt) {
 }
 
 Ship.prototype.fire = function(targetVelocity) {
-
-	if(this.anchor == undefined)
-		throw new Error('Not allowed to fire the ship while not attached to a planet!');
-
-	this.velocity = { x: this.anchor.velocity.x, y: this.anchor.velocity.y }
-
-	this.anchor = undefined;
+	this.detatch();
 
 	this.distanceTraveled = 0;
 
-	var force = {x:targetVelocity * Math.cos(this.angle) * this.mass, y:targetVelocity * Math.sin(this.angle) * this.mass};
+	var force = PolarToRectangular(this.angle, targetVelocity);
 
 	this.addForce(force);
 }
