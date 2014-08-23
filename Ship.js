@@ -19,14 +19,16 @@ Ship.prototype.image = images.ship;
 Ship.prototype.tick = function(dt) {
 	Pawn.prototype.tick.call(this,dt);
 
-	if(!this.anchor){
+	this.collide(this.checkForCollisions());
+
+	if(this.nodes.length){
 		if(this.weAreTooFarFromThePreviousNode())
 			this.nodes.push(new RopeSegment(game, this.x, this.y));
-
+	}
+	this.adjustRope(dt);
+	if(!this.anchor)
 		this.beAffectedByGravity(dt);
 
-		this.adjustRope(dt);
-	}
 }
 
 Ship.prototype.adjustRope = function() {
@@ -107,6 +109,20 @@ Ship.prototype.fire = function(targetVelocity) {
 	var force = PolarToRectangular(this.angle, targetVelocity);
 
 	this.addForce(force);
+}
+
+Ship.prototype.checkForCollisions = function () {
+
+	var planets = this.game.getPlanets();
+	for(var i=0; i<planets.length; i++){
+		if (this.distanceTo(planets[i]) < planets[i].radius - 1)
+			return planets[i];
+	};
+}
+
+Ship.prototype.collide = function(planet) {
+	if (planet == null) return;
+	this.attachTo(planet);
 }
 
 MixInto(Ship.prototype, Attachable);

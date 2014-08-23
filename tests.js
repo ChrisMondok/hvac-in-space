@@ -2,8 +2,11 @@ function TwoBodyTest() {
 	var a = new Planet(game, 200, 200);
 	var b = new Planet(game, 600, 200);
 
-	a.velocity.y = 1;
-	b.velocity.y = -1;
+	a.angularVelocity = 1;
+	ship = new Ship(game, 100,100);
+	window.ship = ship;
+
+	ship.attachTo(a);
 }
 
 function SunTest() {
