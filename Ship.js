@@ -59,7 +59,21 @@ Ship.prototype.beAffectedByGravity = function(dt) {
 
 Ship.prototype.draw = function(dt) {
 	Pawn.prototype.draw.call(this, dt);
+
 	this.game.ctx.drawImageRotated(this.image, this.x, this.y, this.angle);
+
+	if(this.nodes.length)
+		this.drawRope(dt);
+}
+
+Ship.prototype.drawRope = function(dt) {
+	var ctx = this.game.ctx;
+	ctx.strokeStyle = "#FFFFFF";
+	ctx.lineWidth = 8;
+	ctx.beginPath();
+	this.nodes.forEach(function(n) { ctx.lineTo(n.x, n.y); });
+	ctx.lineTo(this.x, this.y);
+	ctx.stroke();
 }
 
 Ship.prototype.fire = function(targetVelocity) {
