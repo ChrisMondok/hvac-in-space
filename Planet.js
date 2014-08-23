@@ -24,14 +24,6 @@ Planet.prototype.draw = function(dt) {
 	
 }
 
-Planet.prototype.distanceTo = function(otherPlanet) {
-	return Math.sqrt(Math.pow(this.x - otherPlanet.x, 2) + Math.pow(this.y - otherPlanet.y, 2)); 
-}
-
-Planet.prototype.directionTo = function(otherPlanet) {
-	return Math.atan2( otherPlanet.y - this.y, otherPlanet.x - this.x );
-}
-
 Planet.prototype.orbitBody = function(otherBody, clockwise) {
 	this.velocity.x = otherBody.velocity.x;
 	this.velocity.y = otherBody.velocity.y;
