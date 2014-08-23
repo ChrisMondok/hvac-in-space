@@ -1,10 +1,16 @@
 var Ship = extend(Pawn);
+Ship.prototype.NODE_DISTANCE = 20;
+
+Ship.prototype.nodes = [];
 
 Ship.prototype.planet = undefined;
 
 Ship.prototype.planetAngle = 0;
 Ship.prototype.angle = 0;
 Ship.prototype.mass = 10;
+
+Ship.prototype.distanceTraveled = 0;
+Ship.prototype.distanceSinceLastNode = 0;
 
 Ship.prototype.image = images.ship;
 
@@ -13,6 +19,20 @@ Ship.prototype.tick = function(dt) {
 		Pawn.prototype.tick.call(this,dt);
 
 	if(this.planet == undefined){
+
+		var dx = this.velocity.x * dt;
+		var dy = this.velocity.y * dt;
+
+		var dist = Math.sqrt((dx * dx) + (dy * dy));
+		this.distanceTraveled += dist;
+		this.distanceSinceLastNode += dist;
+
+		if(this.distanceSinceLastNode >= this.NODE_DISTANCE){
+			this.nodes.push(new Node(game, this.x, this.y));
+			this.distanceSinceLastNode = 0;
+		}
+
+		console.log(this.distanceTraveled);
 	
 	} else {
 
@@ -35,7 +55,11 @@ Ship.prototype.attachToPlanet = function(planet) {
 
 Ship.prototype.fire = function(targetVelocity) {
 
+	if(this.planet == undefined)
+		throw new Error('Not allowed to fire the ship while not attached to a planet!');
+
 	this.planet = undefined;
+	this.distanceTraveled = 0;
 
 	var force = {x:targetVelocity * Math.cos(this.angle) * this.mass, y:targetVelocity * Math.sin(this.angle) * this.mass};
 	this.addForce(force);
