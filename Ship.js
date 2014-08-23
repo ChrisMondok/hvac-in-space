@@ -3,7 +3,7 @@ var Ship = extend(Pawn, function Ship() {
 	this.nodes = [];
 });
 
-Ship.prototype.NODE_DISTANCE = 120;
+Ship.prototype.NODE_DISTANCE = 64;
 
 Ship.prototype.planet = undefined;
 
@@ -24,6 +24,24 @@ Ship.prototype.tick = function(dt) {
 			this.nodes.push(new RopeSegment(game, this.x, this.y));
 
 		this.beAffectedByGravity(dt);
+
+		this.adjustRope(dt);
+	}
+}
+
+Ship.prototype.adjustRope = function() {
+	for(var i = 1; i < this.nodes.length; i++)
+	{
+		var thisNode = this.nodes[i];
+		var previousNode = this.nodes[i-1];
+
+		if(thisNode.distanceTo(previousNode) > this.NODE_DISTANCE) {
+			var direction = previousNode.directionTo(thisNode);
+			var offset = PolarToRectangular(direction, this.NODE_DISTANCE);
+
+			thisNode.x = previousNode.x + offset.x;
+			thisNode.y = previousNode.y + offset.y;
+		}
 	}
 }
 
