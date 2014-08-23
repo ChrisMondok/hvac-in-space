@@ -29,7 +29,9 @@ Planet.prototype.directionTo = function(otherPlanet) {
 }
 
 Planet.prototype.orbitBody = function(otherBody, clockwise) {
-	
+	this.velocity.x = otherBody.velocity.x;
+	this.velocity.y = otherBody.velocity.y;
+
 	var targetVelocity = Math.sqrt( game.CONSTANT_OF_GRAVITY * (this.mass + otherBody.mass) / this.distanceTo(otherBody));
 	var forceDirection = this.directionTo(otherBody);
 	if(clockwise)
