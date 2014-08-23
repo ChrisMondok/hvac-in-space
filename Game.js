@@ -18,6 +18,7 @@ function Game() {
 	this.resizeCanvas();
 
 	this.backgroundPattern = this.ctx.createPattern(this.backgroundImage, 'repeat');
+	this.starPattern = this.ctx.createPattern(images.stars, 'repeat');
 }
 
 Game.prototype.backgroundImage = images.background;
@@ -63,6 +64,8 @@ Game.prototype.draw = function(dt) {
 	this.ctx.fillStyle = 'black';
 	this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 	this.ctx.fillStyle = this.backgroundPattern;
+	this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+	this.ctx.fillStyle = this.starPattern;
 	this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 
 	this.instances[Pawn.name].forEach(function(pawn) {
