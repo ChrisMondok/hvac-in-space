@@ -23,7 +23,8 @@ var imageHandles = {
 	redPlanet: "images/red_planet.png",
 	sun: "images/sun.png",
 	ship: "images/ship.png",
-	background: "images/background.png"
+	background: "images/spacebg.png",
+	stars: "images/background.png"
 };
 
 for(var name in imageHandles) {
