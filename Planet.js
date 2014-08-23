@@ -34,7 +34,7 @@ Planet.prototype.orbitBody = function(otherBody, clockwise) {
 	else
 		forceDirection -= Math.PI/2;
 
-	var force = {x:targetVelocity * Math.cos(forceDirection) * this.mass, y:targetVelocity * Math.sin(forceDirection) * this.mass};
+	var force = PolarToRectangular(forceDirection, targetVelocity * this.mass);
 	this.addForce(force);
 	otherBody.addForce({x:force.x * -1, y:force.y * -1});
 }
