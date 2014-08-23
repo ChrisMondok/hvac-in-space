@@ -4,6 +4,8 @@ function Game() {
 
 	this.canvas = document.createElement('canvas');
 
+	this.ctx = this.canvas.getContext('2d');
+
 	var resizeListener = this.resizeCanvas.bind(this);
 
 	window.addEventListener("resize", resizeListener);
@@ -21,6 +23,25 @@ Game.prototype.destructor = function() {
 Game.prototype.tick = function() {
 	var now = new Date();
 	var dt = now - this.lastTick;
+
+	this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+	for(var i = 0; i < this.pawns.length; i++) {
+		this.pawns[i].tick(dt);
+	}
+
+	var planets = this.pawns.filter(function(pawn) { return pawn instanceof Planet; });
+	for(var i = 0; i < planets.length - 1; i++) {
+		for(var j = i + 1; j < planets.length; j++) {
+			var gravity = planets[i].getGravity(planets[j]);
+			planets[i].addForce(gravity);
+			planets[j].addForce({x: -gravity.x, y: -gravity.y});
+		}
+	}
+
+	for(var i = 0; i < this.pawns.length; i++) {
+		this.pawns[i].draw(dt);
+	}
 
 	this.lastTick = now;
 }
