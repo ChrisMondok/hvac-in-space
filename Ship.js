@@ -1,8 +1,9 @@
-var Ship = extend(Pawn, function Ship() {Pawn.apply(this, arguments)});
+var Ship = extend(Pawn, function Ship() {
+	Pawn.apply(this, arguments)
+	this.nodes = [];
+});
 
-Ship.prototype.NODE_DISTANCE = 12;
-
-Ship.prototype.nodes = [];
+Ship.prototype.NODE_DISTANCE = 120;
 
 Ship.prototype.planet = undefined;
 
@@ -19,20 +20,23 @@ Ship.prototype.tick = function(dt) {
 	Pawn.prototype.tick.call(this,dt);
 
 	if(!this.anchor){
-		var dx = this.velocity.x * dt;
-		var dy = this.velocity.y * dt;
-
-		var dist = Math.sqrt((dx * dx) + (dy * dy));
-		this.distanceTraveled += dist;
-		this.distanceSinceLastNode += dist;
-
-		if(this.distanceSinceLastNode >= this.NODE_DISTANCE){
+		if(this.weAreTooFarFromThePreviousNode())
 			this.nodes.push(new RopeSegment(game, this.x, this.y));
-			this.distanceSinceLastNode = 0;
-		}
 
 		this.beAffectedByGravity(dt);
 	}
+}
+
+Ship.prototype.weAreTooFarFromThePreviousNode = function() {
+	var lastNode = this.nodes[this.nodes.length - 1];
+	return this.distanceTo(lastNode) > this.NODE_DISTANCE;
+}
+
+Ship.prototype.destructor = function() {
+	Pawn.prototype.destructor.apply(this, arguments);
+	this.nodes.forEach(function(n) {
+		n.destructor();
+	});
 }
 
 Ship.prototype.beAffectedByGravity = function(dt) {
@@ -59,6 +63,11 @@ Ship.prototype.draw = function(dt) {
 }
 
 Ship.prototype.fire = function(targetVelocity) {
+	var node = new RopeSegment(game, this.x, this.y);
+	node.attachTo(this.anchor);
+
+	this.nodes.push(node);
+
 	this.detatch();
 
 	this.distanceTraveled = 0;

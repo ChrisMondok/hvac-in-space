@@ -8,3 +8,5 @@ RopeSegment.prototype.draw = function(dt) {
 	ctx.arc(this.x, this.y, 5, 0, 2*Math.PI);
 	ctx.fill();
 }
+
+MixInto(RopeSegment.prototype, Attachable);
