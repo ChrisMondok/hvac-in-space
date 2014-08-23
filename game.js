@@ -9,6 +9,18 @@ function init() {
 	resizeCanvas();
 
 	window.addEventListener("resize", resizeCanvas);
+
+	var lastTime = new Date();
+
+	function main() {
+		var dt = new Date() - lastTime;
+
+		requestAnimationFrame(main);
+	}
+
+	main();
+
+
 }
 
 window.addEventListener("load", init);
