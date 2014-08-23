@@ -4,13 +4,16 @@ Ship.prototype.planet = undefined;
 
 Ship.prototype.planetAngle = 0;
 Ship.prototype.angle = 0;
+Ship.prototype.mass = 10;
 
 Ship.prototype.image = images.ship;
 
 Ship.prototype.tick = function(dt) {
 
+		Pawn.prototype.tick.call(this,dt);
+
 	if(this.planet == undefined){
-		/* logic! */
+	
 	} else {
 
 		this.angle = this.planetAngle + this.planet.rotationAngle;
@@ -29,4 +32,17 @@ Ship.prototype.draw = function(dt) {
 	ctx.rotate(this.angle);
 	ctx.drawImage(this.image, 0, 0);
 	ctx.restore();
+}
+
+Ship.prototype.attachToPlanet = function(planet) {
+	this.planet = planet;
+	this.velocity = {x:0, y:0};
+}
+
+Ship.prototype.fire = function(targetVelocity) {
+
+	this.planet = undefined;
+
+	var force = {x:targetVelocity * Math.cos(this.angle) * this.mass, y:targetVelocity * Math.sin(this.angle) * this.mass};
+	this.addForce(force);
 }
