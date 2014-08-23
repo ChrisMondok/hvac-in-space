@@ -19,8 +19,6 @@ function init() {
 	}
 
 	main();
-
-
 }
 
 window.addEventListener("load", init);
