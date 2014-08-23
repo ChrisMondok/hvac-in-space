@@ -1,4 +1,4 @@
-var Ship = extend(Pawn);
+var Ship = extend(Pawn, function Ship() {Pawn.apply(this, arguments)});
 
 Ship.prototype.planet = undefined;
 

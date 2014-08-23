@@ -1,4 +1,4 @@
-var Planet = extend(Pawn);
+var Planet = extend(Pawn, function Planet() {Pawn.apply(this, arguments)});
 
 Planet.prototype.mass = 1000;
 

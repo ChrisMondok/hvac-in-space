@@ -1,5 +1,8 @@
 function Game() {
-	this.pawns = [];
+	this.instances = {};
+	for(var key in types)
+		this.instances[key] = [];
+
 	this.lastTick = new Date();
 
 	this.canvas = document.createElement('canvas');
@@ -21,25 +24,27 @@ Game.prototype.backgroundImage = images.background;
 
 Game.prototype.destructor = function() {
 	window.removeEventListener('resize', this.resizeListener);
-	this.canvas.parentNode.removeChild(this.canvas);	
+	this.canvas.parentNode.removeChild(this.canvas);
+}
+
+Game.prototype.addPawn = function(pawn) {
+	for(var typeName in this.instances) {
+		if(pawn instanceof types[typeName])
+			this.instances[typeName].push(pawn);
+	}
 }
 
 Game.prototype.tick = function() {
 	var now = new Date();
 	var dt = (now - this.lastTick)/1000;
 
-	this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-	this.ctx.fillStyle = 'black';
-	this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-	this.ctx.fillStyle = this.backgroundPattern;
-	this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-	
+	var pawns = this.instances[Pawn.name];
+	this.instances[Pawn.name].forEach(function(p) {
+		p.tick(dt);
+	});
 
-	for(var i = 0; i < this.pawns.length; i++) {
-		this.pawns[i].tick(dt);
-	}
+	var planets = this.instances[Planet.name];
 
-	var planets = this.pawns.filter(function(pawn) { return pawn instanceof Planet; });
 	for(var i = 0; i < planets.length - 1; i++) {
 		for(var j = i + 1; j < planets.length; j++) {
 			var gravity = planets[i].getGravity(dt, planets[j]);
@@ -48,11 +53,21 @@ Game.prototype.tick = function() {
 		}
 	}
 
-	for(var i = 0; i < this.pawns.length; i++) {
-		this.pawns[i].draw(dt);
-	}
+	this.draw(dt);
 
 	this.lastTick = now;
+}
+
+Game.prototype.draw = function(dt) {
+	this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+	this.ctx.fillStyle = 'black';
+	this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+	this.ctx.fillStyle = this.backgroundPattern;
+	this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+
+	this.instances[Pawn.name].forEach(function(pawn) {
+		pawn.draw(dt);
+	});
 }
 
 Game.prototype.resizeCanvas = function() {
