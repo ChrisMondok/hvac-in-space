@@ -21,6 +21,8 @@ function Game() {
 	this.starPattern = this.ctx.createPattern(images.stars, 'repeat');
 }
 
+Game.prototype.timeScale = 1;
+
 Game.prototype.backgroundImage = images.background;
 
 Game.prototype.destructor = function() {
@@ -37,7 +39,7 @@ Game.prototype.addPawn = function(pawn) {
 
 Game.prototype.tick = function() {
 	var now = new Date();
-	var dt = (now - this.lastTick)/1000;
+	var dt = (now - this.lastTick)/1000 * this.timeScale;
 
 	var pawns = this.instances[Pawn.name];
 	this.instances[Pawn.name].forEach(function(p) {
@@ -71,6 +73,10 @@ Game.prototype.draw = function(dt) {
 	this.instances[Pawn.name].forEach(function(pawn) {
 		pawn.draw(dt);
 	});
+
+	this.ctx.textAlign = 'right';
+	this.ctx.fillStyle = '#FFF';
+	this.ctx.fillText(Math.floor(this.timeScale/dt), this.canvas.width - 32, 32);
 }
 
 Game.prototype.resizeCanvas = function() {
