@@ -8,25 +8,32 @@ function Game() {
 
 	var resizeListener = this.resizeCanvas.bind(this);
 
-	window.addEventListener("resize", resizeListener);
+	window.addEventListener('resize', resizeListener);
 
 	document.body.appendChild(this.canvas);
 
 	this.resizeCanvas();
+
+	this.backgroundPattern = this.ctx.createPattern(this.backgroundImage, 'repeat');
 }
 
+Game.prototype.backgroundImage = images.background;
+
 Game.prototype.destructor = function() {
-	window.removeEventListener("resize", this.resizeListener);
+	window.removeEventListener('resize', this.resizeListener);
 	this.canvas.parentNode.removeChild(this.canvas);	
 }
 
 Game.prototype.tick = function() {
 	var now = new Date();
-	var dt = now - this.lastTick;
+	var dt = (now - this.lastTick)/1000;
 
 	this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-	this.ctx.fillStyle = "black";
+	this.ctx.fillStyle = 'black';
 	this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+	this.ctx.fillStyle = this.backgroundPattern;
+	this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+	
 
 	for(var i = 0; i < this.pawns.length; i++) {
 		this.pawns[i].tick(dt);
@@ -35,7 +42,7 @@ Game.prototype.tick = function() {
 	var planets = this.pawns.filter(function(pawn) { return pawn instanceof Planet; });
 	for(var i = 0; i < planets.length - 1; i++) {
 		for(var j = i + 1; j < planets.length; j++) {
-			var gravity = planets[i].getGravity(planets[j]);
+			var gravity = planets[i].getGravity(dt, planets[j]);
 			planets[i].addForce(gravity);
 			planets[j].addForce({x: -gravity.x, y: -gravity.y});
 		}
@@ -50,8 +57,8 @@ Game.prototype.tick = function() {
 
 Game.prototype.resizeCanvas = function() {
 	console.log(this.canvas.offsetWidth);
-	this.canvas.setAttribute("width", this.canvas.offsetWidth);
-	this.canvas.setAttribute("height", this.canvas.offsetHeight);
+	this.canvas.setAttribute('width', this.canvas.offsetWidth);
+	this.canvas.setAttribute('height', this.canvas.offsetHeight);
 }
 
 Game.prototype.CONSTANT_OF_GRAVITY = 1;

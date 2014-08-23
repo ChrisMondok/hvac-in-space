@@ -4,15 +4,13 @@ Planet.prototype.mass = 1000;
 
 Planet.prototype.image = images.bluePlanet;
 
-Planet.prototype.rotationAngle = 0;
-
 Planet.prototype.radius = 100;
 
-Planet.prototype.getGravity = function(otherPlanet) {
+Planet.prototype.getGravity = function(dt, otherPlanet) {
 	if(!(this.mass && otherPlanet.mass))
 		throw new RangeError("Both bodies must have mass!");
 
-	var magnitude =  this.game.CONSTANT_OF_GRAVITY * (this.mass * otherPlanet.mass) / Math.pow(this.distanceTo(otherPlanet),2);
+	var magnitude =  dt * this.game.CONSTANT_OF_GRAVITY * (this.mass * otherPlanet.mass) / Math.pow(this.distanceTo(otherPlanet),2);
 	var direction = this.directionTo(otherPlanet);
 
 	return {y:magnitude * Math.sin(direction), x:magnitude * Math.cos(direction)}
@@ -21,7 +19,9 @@ Planet.prototype.getGravity = function(otherPlanet) {
 Planet.prototype.draw = function(dt) {
 	Pawn.prototype.draw.call(this, dt);
 
-	this.game.ctx.drawImage(this.image, this.x - this.image.width / 2, this.y - this.image.height / 2);
+	var ctx = this.game.ctx;
+	ctx.drawImageRotated(this.image, this.x, this.y, this.angle);
+	
 }
 
 Planet.prototype.distanceTo = function(otherPlanet) {
