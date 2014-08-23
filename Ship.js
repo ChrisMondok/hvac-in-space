@@ -49,13 +49,17 @@ Ship.prototype.draw = function(dt) {
 
 Ship.prototype.fire = function(targetVelocity) {
 
-	if(this.planet == undefined)
+	if(this.anchor == undefined)
 		throw new Error('Not allowed to fire the ship while not attached to a planet!');
 
-	this.planet = undefined;
+	this.velocity = { x: this.anchor.velocity.x, y: this.anchor.velocity.y }
+
+	this.anchor = undefined;
+
 	this.distanceTraveled = 0;
 
 	var force = {x:targetVelocity * Math.cos(this.angle) * this.mass, y:targetVelocity * Math.sin(this.angle) * this.mass};
+
 	this.addForce(force);
 }
 

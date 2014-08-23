@@ -29,5 +29,4 @@ function ShipTest() {
 	window.ship = ship;
 
 	ship.attachTo(earth);
-
 }
