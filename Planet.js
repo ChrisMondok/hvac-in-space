@@ -1,8 +1,8 @@
 var Planet = extend(Pawn);
 
-Planet.prototype.x;
+Planet.prototype.mass = 1000;
 
-Planet.prototype.y;
+Planet.prototype.image = images.bluePlanet;
 
 Planet.prototype.getGravity = function(otherPlanet) {
 
@@ -10,6 +10,12 @@ Planet.prototype.getGravity = function(otherPlanet) {
 	var direction = this.directionTo(otherPlanet);
 
 	return {y:magnitude * Math.sin(direction), x:magnitude * Math.cos(direction)}
+}
+
+Planet.prototype.draw = function(dt) {
+	Pawn.prototype.draw.call(this, dt);
+
+	this.game.ctx.drawImage(this.image, this.x - this.image.width / 2, this.y - this.image.height / 2);
 }
 
 Planet.prototype.distanceTo = function(otherPlanet) {
