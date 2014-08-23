@@ -19,6 +19,9 @@ function Game() {
 
 	this.backgroundPattern = this.ctx.createPattern(this.backgroundImage, 'repeat');
 	this.starPattern = this.ctx.createPattern(images.stars, 'repeat');
+
+	this.screenScale = 1;
+	this.screenTopLeft = {x: 0, y: 0};
 }
 
 Game.prototype.timeScale = 1;
@@ -59,25 +62,57 @@ Game.prototype.tick = function() {
 	this.draw(dt);
 
 	this.lastTick = now;
-}
+};
 
 Game.prototype.draw = function(dt) {
-	this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+	this.ctx.save();
+
+	this.centerShips(dt);
+
+	this.ctx.clearRect(-this.screenTopLeft.x, -this.screenTopLeft.y, this.canvas.width, this.canvas.height);
 	this.ctx.fillStyle = 'black';
-	this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+	this.ctx.fillRect(-this.screenTopLeft.x, -this.screenTopLeft.y, this.canvas.width, this.canvas.height);
 	this.ctx.fillStyle = this.backgroundPattern;
-	this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+	this.ctx.fillRect(-this.screenTopLeft.x, -this.screenTopLeft.y, this.canvas.width, this.canvas.height);
 	this.ctx.fillStyle = this.starPattern;
-	this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+	this.ctx.fillRect(-this.screenTopLeft.x, -this.screenTopLeft.y, this.canvas.width, this.canvas.height);
 
 	this.instances[Pawn.name].forEach(function(pawn) {
 		pawn.draw(dt);
 	});
 
+	this.ctx.restore();
+
 	this.ctx.textAlign = 'right';
 	this.ctx.fillStyle = '#FFF';
 	this.ctx.fillText(Math.floor(this.timeScale/dt), this.canvas.width - 32, 32);
-}
+};
+
+Game.prototype.centerShips = function(dt) {
+	var center = {x: 0, y: 0};
+	var ships = this.instances[Ship.name];
+
+	if(ships.length) {
+		for(var i = 0; i < ships.length; i++) {
+			center.x += ships[i].x;
+			center.y += ships[i].y;
+		}
+
+		center.x /= ships.length;
+		center.y /= ships.length;
+	}
+	else {
+		center.x = this.canvas.width/2;
+		center.y = this.canvas.height/2;
+	}
+
+	this.screenTopLeft = {
+		x: -center.x + this.canvas.width/2,
+		y: -center.y + this.canvas.height/2
+	};
+
+	this.ctx.translate(this.screenTopLeft.x, this.screenTopLeft.y);
+};
 
 Game.prototype.resizeCanvas = function() {
 	console.log(this.canvas.offsetWidth);
