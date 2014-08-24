@@ -1,4 +1,4 @@
-function Particle(game, drawFunction, position, velocity, duration) {
+function Particle(game, drawFunction, position, velocity, duration, properties) {
 	
 	if(!game || !game instanceof Game)
 		throw new TypeError("Game isn't right.");
@@ -12,6 +12,8 @@ function Particle(game, drawFunction, position, velocity, duration) {
 	this.velocity = velocity || {x:0, y:0};
 	this.duration = duration || NaN;
 	this.initialDuration = this.duration;
+	this.properties = properties;
+	console.log(properties.color);
 
 	game.addParticle(this);
 }
@@ -38,10 +40,12 @@ Particle.prototype.destructor = function() {
 }
 
 Particle.linearFade = function(dt) {
+
+
 	this.game.ctx.save();
 	this.game.ctx.globalAlpha = (this.duration / this.initialDuration);
 	//this.game.ctx.drawImage(images.sun, this.position.x, this.position.y, 20, 20);
-	this.game.ctx.fillStyle = '#DDDDDD';
+	this.game.ctx.fillStyle = this.properties.color;
 	this.game.ctx.beginPath();
 	this.game.ctx.arc(this.position.x, this.position.y, 10, 0, Math.PI * 2);
 	this.game.ctx.fill();
