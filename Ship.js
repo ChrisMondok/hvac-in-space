@@ -16,6 +16,8 @@ Ship.prototype.distanceSinceLastNode = 0;
 
 Ship.prototype.image = images.ship;
 
+Ship.prototype.wheelAngle = 0;
+
 Ship.prototype.tick = function(dt) {
 	Pawn.prototype.tick.call(this,dt);
 
@@ -23,7 +25,7 @@ Ship.prototype.tick = function(dt) {
 
 	if(this.nodes.length){
 		if(this.weAreTooFarFromThePreviousNode())
-			this.nodes.push(new RopeSegment(game, this.x, this.y));
+	 		this.nodes.push(new RopeSegment(game, this.x, this.y));
 	}
 	this.adjustRope(dt);
 	if(!this.anchor)
@@ -80,10 +82,25 @@ Ship.prototype.beAffectedByGravity = function(dt) {
 Ship.prototype.draw = function(dt) {
 	Pawn.prototype.draw.call(this, dt);
 
+	this.drawWheel(dt);
 	this.game.ctx.drawImageRotated(this.image, this.x, this.y, this.angle);
 
 	if(this.nodes.length)
 		this.drawRope(dt);
+}
+
+Ship.prototype.drawWheel = function(dt) {
+	var wheelImage = images.wheel;
+	this.wheelAngle += (dt);
+	var offset = {
+		x:-13,
+		y:-21
+	}
+	var dir = RectangularToPolar(offset.x, offset.y) + this.angle;
+	
+	offset = PolarToRectangular(dir, Magnitude(offset.x, offset.y));
+
+	this.game.ctx.drawImageRotated(wheelImage, this.x + offset.x, this.y + offset.y, this.wheelAngle);
 }
 
 Ship.prototype.drawRope = function(dt) {
