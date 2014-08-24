@@ -151,9 +151,18 @@ Ship.prototype.emitParticles = function(dt) {
 			new Particle(
 					game, 
 					Particle.linearFade, 
-					{x:this.x - 5, y:this.y - 5}, 
-					{x:-1, y:Math.random()*.3 - 0.15}, 
-					1
+					{
+						x:this.x - 5, 
+						y:this.y - 5
+					}, 
+					{
+						x:-1, 
+						y:Math.random()*.3 - 0.15
+					}, 
+					1,
+					{
+						color:'hsl(' + Math.floor(Math.random()*50+130) + ', 100%, 50%)'
+					}
 			);
 		}
 }
