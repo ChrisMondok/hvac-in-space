@@ -2,10 +2,11 @@ var RopeSegment = extend(Pawn, function RopeSegment(){Pawn.apply(this, arguments
 
 RopeSegment.prototype.draw = function(dt) {
 	Pawn.prototype.draw.call(this, dt);
+	return;
 	var ctx = this.game.ctx;
 	ctx.beginPath();
 	ctx.fillStyle = "white";
-	ctx.arc(this.x, this.y, 5, 0, 2*Math.PI);
+	ctx.arc(this.x, this.y, 10, 0, 2*Math.PI);
 	ctx.fill();
 }
 
@@ -14,8 +15,17 @@ RopeSegment.prototype.tick = function(dt) {
 	this.collide(this.checkForCollisions());
 }
 
-RopeSegment.prototype.checkForCollisions = function () {
+RopeSegment.prototype.interpolateTo = function(target, amount) {
+	if(!this.interpolateStartedAt)
+		this.interpolateStartedAt = { x: this.x, y: this.y };
 
+	var output= InterpolatePositions(this.interpolateStartedAt, target, amount);
+
+	this.x = output.x;
+	this.y = output.y;
+}
+
+RopeSegment.prototype.checkForCollisions = function () {
 	var planets = this.game.getPlanets();
 	for(var i=0; i<planets.length; i++){
 		if (this.distanceTo(planets[i]) < planets[i].radius - 1)

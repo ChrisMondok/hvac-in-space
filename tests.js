@@ -1,6 +1,6 @@
 function TwoBodyTest() {
 	var a = new Planet(game, 200, 200);
-	var b = new Planet(game, 600, 200);
+	var b = new Planet(game, 1200, 200);
 
 	a.angularVelocity = 1;
 	b.angularVelocity = -1.5;
@@ -41,6 +41,8 @@ function LassoTest() {
 
 	var c = new Planet(game, 450, 600);
 
+	c.image = images.redPlanet;
+
 	ship = new Ship(game, 300,200);
 	window.ship = ship;
 
@@ -49,8 +51,6 @@ function LassoTest() {
 	ship.fire(100);
 
 	c.velocity = {x:0, y: -100};
-
-	window.c = c;
 }
 
 function SolarSystemTest(numPlanets) {

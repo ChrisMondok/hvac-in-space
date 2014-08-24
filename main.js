@@ -65,3 +65,10 @@ function PolarToRectangular(direction, magnitude) {
 		y: - magnitude * Math.sin(direction)
 	};
 }
+
+function InterpolatePositions(from, to, amount) {
+	return {
+		x: to.x * amount + from.x * (1 - amount),
+		y: to.y * amount + from.y * (1 - amount) 
+	};
+}

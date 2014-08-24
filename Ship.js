@@ -5,6 +5,8 @@ var Ship = extend(Pawn, function Ship() {
 
 Ship.prototype.NODE_DISTANCE = 64;
 
+Ship.prototype.ROPE_TENSIONING_DELAY = 10;
+
 Ship.prototype.planet = undefined;
 
 Ship.prototype.planetAngle = 0;
@@ -23,17 +25,76 @@ Ship.prototype.tick = function(dt) {
 
 	this.collide(this.checkForCollisions());
 
-	if(this.nodes.length){
-		if(this.weAreTooFarFromThePreviousNode())
-			this.nodes.push(new RopeSegment(game, this.x, this.y));
+	if(this.anchor) {
+		if(this.nodes.length) {
+			this.interpolateNodes(dt);
+
+			this.otherPlanet.angularVelocity = 0;
+			this.anchor.angularVelocity = 0;
+
+			var anchorRotationOffset =  this.anchor.directionTo(this.otherPlanet) - this.anchor.directionTo(this);
+			var otherPlanetRotationOffset =  this.otherPlanet.directionTo(this.anchor) - this.otherPlanet.directionTo(this.nodes[0]);
+
+			debugger;
+
+			this.anchor.angle += anchorRotationOffset;
+			//this.otherPlanet.angle += otherPlanetRotationOffset;
+
+		}
 	}
-	this.adjustRope(dt);
-	if(!this.anchor)
+	else {
+		if(this.nodes.length){
+			if(this.weAreTooFarFromThePreviousNode())
+				this.nodes.push(new RopeSegment(game, this.x, this.y));
+		}
+
 		this.beAffectedByGravity(dt);
 
+		this.adjustRopeInSpace(dt);
+	}
 }
 
-Ship.prototype.adjustRope = function() {
+Ship.prototype.attachTo = function(anchor) {
+	if(this.nodes.length) {
+		this.otherPlanet = this.nodes[0].anchor;
+		this.ropeDelayRemaining = this.ROPE_TENSIONING_DELAY;
+		var toDelete = 0;
+		for(var i = 0; i < this.nodes.length; i++) {
+			if(this.nodes[i+1] && this.nodes[i+1].anchor)
+				toDelete++;
+		}
+
+		while(toDelete) {
+			toDelete--;
+			this.nodes.shift().destructor();
+		}
+
+//		this.anchorRotationOffset =  anchor.directionTo(this.otherPlanet) - anchor.directionTo(this);
+//		this.otherPlanetRotationOffset =  this.otherPlanet.directionTo(anchor) - this.otherPlanet.directionTo(this.nodes[0]);
+//		this.otherPlanet.angularVelocity = 0;
+//		anchor.angularVelocity = 0;
+//
+//		anchor.angle += this.anchorRotationOffset;
+//		this.otherPlanet.angle += this.otherPlanetRotationOffset;
+	}
+	else
+		this.otherPlanet = null;
+}
+
+Ship.prototype.interpolateNodes = function(dt) {
+	this.ropeDelayRemaining -= dt;
+	if(this.ropeDelayRemaining < 0) {
+		this.destroyRope();
+	}
+	for(var i = 0; i < this.nodes.length; i++) {
+		var amount = 1 - (this.ropeDelayRemaining / this.ROPE_TENSIONING_DELAY);
+		var targetForNode = InterpolatePositions(this.nodes[0], this, i / this.nodes.length);
+		this.nodes[i].interpolateTo(targetForNode, amount);
+		
+	}
+}
+
+Ship.prototype.adjustRopeInSpace = function() {
 	for(var i = 1; i < this.nodes.length; i++)
 	{
 		thisNode = this.nodes[i];
@@ -100,8 +161,9 @@ Ship.prototype.draw = function(dt) {
 
 Ship.prototype.drawRope = function(dt) {
 	var ctx = this.game.ctx;
-	ctx.strokeStyle = "#FFFFFF";
-	ctx.lineJoin = "round";
+	ctx.strokeStyle = '#FFFFFF';
+	ctx.lineCap = 'roudn';
+	ctx.lineJoin = 'round';
 	ctx.lineWidth = 8;
 	ctx.beginPath();
 	this.nodes.forEach(function(n) { ctx.lineTo(n.x, n.y); });
