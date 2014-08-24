@@ -1,11 +1,12 @@
 var Ship = extend(Pawn, function Ship() {
 	Pawn.apply(this, arguments)
 	this.nodes = [];
+	this.winching = false;
 });
 
 Ship.prototype.NODE_DISTANCE = 64;
 
-Ship.prototype.ROPE_TENSIONING_DELAY = 10;
+Ship.prototype.ROPE_TENSIONING_DELAY = 1;
 
 Ship.prototype.planet = undefined;
 
@@ -13,7 +14,6 @@ Ship.prototype.planetAngle = 0;
 Ship.prototype.angle = 0;
 Ship.prototype.mass = 1;
 
-Ship.prototype.distanceTraveled = 0;
 Ship.prototype.distanceSinceLastNode = 0;
 
 Ship.prototype.image = images.ship;
@@ -29,18 +29,10 @@ Ship.prototype.tick = function(dt) {
 	if(this.anchor) {
 		if(this.nodes.length) {
 			this.interpolateNodes(dt);
+			this.interpolatePlanets(dt);
 
 			this.otherPlanet.angularVelocity = 0;
 			this.anchor.angularVelocity = 0;
-
-			var anchorRotationOffset =  this.anchor.directionTo(this.otherPlanet) - this.anchor.directionTo(this);
-			var otherPlanetRotationOffset =  this.otherPlanet.directionTo(this.anchor) - this.otherPlanet.directionTo(this.nodes[0]);
-
-			debugger;
-
-			this.anchor.angle += anchorRotationOffset;
-			//this.otherPlanet.angle += otherPlanetRotationOffset;
-
 		}
 	}
 	else {
@@ -52,6 +44,13 @@ Ship.prototype.tick = function(dt) {
 		this.beAffectedByGravity(dt);
 
 		this.adjustRopeInSpace(dt);
+	}
+
+	if(this.winching) {
+		var forceDirection = this.anchor.directionTo(this.otherPlanet);
+		var forceMagnitude = 10000 * dt;
+		this.anchor.addForce(PolarToRectangular(forceDirection, forceMagnitude));
+		this.otherPlanet.addForce(PolarToRectangular(forceDirection + Math.PI, forceMagnitude));
 	}
 }
 
@@ -70,13 +69,10 @@ Ship.prototype.attachTo = function(anchor) {
 			this.nodes.shift().destructor();
 		}
 
-//		this.anchorRotationOffset =  anchor.directionTo(this.otherPlanet) - anchor.directionTo(this);
-//		this.otherPlanetRotationOffset =  this.otherPlanet.directionTo(anchor) - this.otherPlanet.directionTo(this.nodes[0]);
-//		this.otherPlanet.angularVelocity = 0;
-//		anchor.angularVelocity = 0;
-//
-//		anchor.angle += this.anchorRotationOffset;
-//		this.otherPlanet.angle += this.otherPlanetRotationOffset;
+		this.otherPlanet.interpAngleStart = anchor.interpAngleStart = undefined;
+
+		this.anchorRotationOffset =  anchor.directionTo(this.otherPlanet) - anchor.directionTo(this);
+		this.otherPlanetRotationOffset =  this.otherPlanet.directionTo(anchor) - this.otherPlanet.directionTo(this.nodes[0]);
 	}
 	else
 		this.otherPlanet = null;
@@ -86,14 +82,22 @@ Ship.prototype.interpolateNodes = function(dt) {
 	this.ropeDelayRemaining -= dt;
 	if(this.ropeDelayRemaining < 0) {
 		this.destroyRope();
+		this.winching = true;
 	}
 	for(var i = 0; i < this.nodes.length; i++) {
 		var amount = 1 - (this.ropeDelayRemaining / this.ROPE_TENSIONING_DELAY);
+		this.winching = true;
 		var targetForNode = InterpolatePositions(this.nodes[0], this, i / this.nodes.length);
 		this.nodes[i].interpolateTo(targetForNode, amount);
 		
 	}
 	this.emitParticles(dt);
+}
+
+Ship.prototype.interpolatePlanets = function(dt) {
+	var amount = 1 - (this.ropeDelayRemaining / this.ROPE_TENSIONING_DELAY);
+	this.otherPlanet.interpolateAngle(this.otherPlanetRotationOffset, amount);
+	this.anchor.interpolateAngle(this.anchorRotationOffset, amount);
 }
 
 Ship.prototype.adjustRopeInSpace = function() {
@@ -190,13 +194,14 @@ Ship.prototype.drawRope = function(dt) {
 
 Ship.prototype.fire = function(targetVelocity) {
 	var node = new RopeSegment(game, this.x, this.y);
+	this.winching = false;
 	node.attachTo(this.anchor);
 
 	this.nodes.push(node);
 
 	this.detatch();
 
-	this.distanceTraveled = 0;
+	this.angularVelocity = 0;
 
 	var force = PolarToRectangular(this.angle, targetVelocity);
 
@@ -204,7 +209,8 @@ Ship.prototype.fire = function(targetVelocity) {
 }
 
 Ship.prototype.checkForCollisions = function () {
-
+	if(this.anchor)
+		return;
 	var planets = this.game.getPlanets();
 	for(var i=0; i<planets.length; i++){
 		if (this.distanceTo(planets[i]) < planets[i].radius - 1)
@@ -214,6 +220,7 @@ Ship.prototype.checkForCollisions = function () {
 
 Ship.prototype.collide = function(planet) {
 	if (planet == null) return;
+
 	this.attachTo(planet);
 }
 

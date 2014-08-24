@@ -38,3 +38,13 @@ Planet.prototype.orbitBody = function(otherBody, clockwise) {
 	this.addForce(force);
 	otherBody.addForce({x:force.x * -1, y:force.y * -1});
 }
+
+Planet.prototype.interpolateAngle = function(angle, amount) {
+	if(this.interpAngleStart === undefined)
+		this.interpAngleStart = this.angle;
+
+	var actual = (angle + Math.PI * 2) % (2 * Math.PI);
+	if(actual > Math.PI)
+		actual -= 2 * Math.PI;
+	this.angle = this.interpAngleStart + actual * amount;	
+}

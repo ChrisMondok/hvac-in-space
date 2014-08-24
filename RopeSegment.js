@@ -19,6 +19,9 @@ RopeSegment.prototype.interpolateTo = function(target, amount) {
 	if(!this.interpolateStartedAt)
 		this.interpolateStartedAt = { x: this.x, y: this.y };
 
+	if(this.anchor)
+		return;
+
 	var output= InterpolatePositions(this.interpolateStartedAt, target, amount);
 
 	this.x = output.x;
