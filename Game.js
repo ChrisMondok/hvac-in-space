@@ -66,20 +66,32 @@ Game.prototype.tick = function() {
 		p.tick(dt);
 	});
 
-	var planets = this.instances[Planet.name];
-
-	for(var i = 0; i < planets.length - 1; i++) {
-		for(var j = i + 1; j < planets.length; j++) {
-			var gravity = planets[i].getGravity(dt, planets[j]);
-			planets[i].addForce(gravity);
-			planets[j].addForce({x: -gravity.x, y: -gravity.y});
-		}
-	}
+	this.tickPlanets(dt);
 
 	this.draw(dt);
 
 	this.lastTick = now;
 };
+
+Game.prototype.tickPlanets = function(dt) {
+	var planets = this.instances[Planet.name];
+
+	for(var i = 0; i < planets.length - 1; i++) {
+		for(var j = i + 1; j < planets.length; j++) {
+			if(planets[i].distanceTo(planets[j]) < planets[i].radius + planets[j].radius) {
+				if(this.instances.Ship.some(function(s) {return s.anchor == planets[i] || s.anchor == planets[j]}))
+					console.log("Stick 'em together");
+				else
+					console.log("Interplanetary collisions!");
+			}
+			else {
+				var gravity = planets[i].getGravity(dt, planets[j]);
+				planets[i].addForce(gravity);
+				planets[j].addForce({x: -gravity.x, y: -gravity.y});
+			}
+		}
+	}
+}
 
 Game.prototype.draw = function(dt) {
 	this.ctx.save();
