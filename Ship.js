@@ -19,6 +19,7 @@ Ship.prototype.distanceSinceLastNode = 0;
 Ship.prototype.image = images.ship;
 
 Ship.prototype.focalDistance = 0;
+Ship.prototype.wheelAngle = 0;
 
 Ship.prototype.tick = function(dt) {
 	Pawn.prototype.tick.call(this,dt);
@@ -92,6 +93,7 @@ Ship.prototype.interpolateNodes = function(dt) {
 		this.nodes[i].interpolateTo(targetForNode, amount);
 		
 	}
+	this.emitParticles(dt);
 }
 
 Ship.prototype.adjustRopeInSpace = function() {
@@ -153,10 +155,25 @@ Ship.prototype.beAffectedByGravity = function(dt) {
 Ship.prototype.draw = function(dt) {
 	Pawn.prototype.draw.call(this, dt);
 
+	this.drawWheel(dt);
 	this.game.ctx.drawImageRotated(this.image, this.x, this.y, this.angle);
 
 	if(this.nodes.length)
 		this.drawRope(dt);
+}
+
+Ship.prototype.drawWheel = function(dt) {
+	var wheelImage = images.wheel;
+	this.wheelAngle += (dt);
+	var offset = {
+		x:-13,
+		y:-21
+	}
+	var dir = RectangularToPolar(offset.x, offset.y) + this.angle;
+	
+	offset = PolarToRectangular(dir, Magnitude(offset.x, offset.y));
+
+	this.game.ctx.drawImageRotated(wheelImage, this.x + offset.x, this.y + offset.y, this.wheelAngle);
 }
 
 Ship.prototype.drawRope = function(dt) {
@@ -200,4 +217,17 @@ Ship.prototype.collide = function(planet) {
 	this.attachTo(planet);
 }
 
+Ship.prototype.emitParticles = function(dt) {
+		this.timeBetweenParticles -= dt * 10000;
+		if (this.timeBetweenParticles < 0){
+			this.timeBetweenParticles += 1000;
+			new Particle(
+					game, 
+					Particle.linearFade, 
+					{x:this.x - 5, y:this.y - 5}, 
+					{x:-1, y:Math.random()*.3 - 0.15}, 
+					1
+			);
+		}
+}
 MixInto(Ship.prototype, Attachable);

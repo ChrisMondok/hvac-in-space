@@ -24,7 +24,8 @@ var imageHandles = {
 	sun: "images/sun.png",
 	ship: "images/ship.png",
 	background: "images/spacebg.png",
-	stars: "images/background.png"
+	stars: "images/background.png",
+	wheel: "images/winch_wheel.png"
 };
 
 for(var name in imageHandles) {

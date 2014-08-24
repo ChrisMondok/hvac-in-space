@@ -3,6 +3,8 @@ function Game() {
 	for(var key in types)
 		this.instances[key] = [];
 
+	this.particles = [];
+
 	this.lastTick = new Date();
 
 	this.canvas = document.createElement('canvas');
@@ -47,9 +49,17 @@ Game.prototype.removePawn = function(pawn) {
 	}
 }
 
+Game.prototype.addParticle = function(particle) {
+	this.particles.push(particle);
+}
+
 Game.prototype.tick = function() {
 	var now = new Date();
 	var dt = (now - this.lastTick)/1000 * this.timeScale;
+
+	this.particles.forEach(function(particle) {
+		particle.tick(dt);
+	});
 
 	var pawns = this.instances[Pawn.name];
 	this.instances[Pawn.name].forEach(function(p) {
@@ -83,6 +93,10 @@ Game.prototype.draw = function(dt) {
 	this.ctx.fillRect(-this.screenTopLeft.x, -this.screenTopLeft.y, this.canvas.width, this.canvas.height);
 	this.ctx.fillStyle = this.starPattern;
 	this.ctx.fillRect(-this.screenTopLeft.x, -this.screenTopLeft.y, this.canvas.width, this.canvas.height);
+
+	this.particles.forEach(function(particle) {
+		particle.draw(dt);
+	});
 
 	this.instances[Pawn.name].forEach(function(pawn) {
 		pawn.draw(dt);

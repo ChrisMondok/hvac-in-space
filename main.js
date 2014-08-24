@@ -59,6 +59,10 @@ function RectangularToPolar(deltaX, deltaY) {
 	return Math.atan2(-deltaY, deltaX);
 }
 
+function Magnitude(x, y) {
+	return Math.sqrt(x * x + y * y);
+}
+
 function PolarToRectangular(direction, magnitude) {
 	return {
 		x: magnitude * Math.cos(direction),
