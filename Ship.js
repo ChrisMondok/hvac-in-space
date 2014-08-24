@@ -9,12 +9,10 @@ Ship.prototype.ROPE_TENSIONING_DELAY = 10;
 
 Ship.prototype.planet = undefined;
 
-Ship.prototype.planetAngle = 0;
-Ship.prototype.angle = 0;
-Ship.prototype.mass = 1;
-
 Ship.prototype.distanceTraveled = 0;
 Ship.prototype.distanceSinceLastNode = 0;
+
+Ship.prototype.weld = null;
 
 Ship.prototype.image = images.ship;
 
@@ -23,7 +21,9 @@ Ship.prototype.focalDistance = 0;
 Ship.prototype.tick = function(dt) {
 	Pawn.prototype.tick.call(this,dt);
 
-	this.collide(this.checkForCollisions());
+	//this.collide(this.checkForCollisions());
+
+	return;
 
 	if(this.anchor) {
 		if(this.nodes.length) {
@@ -55,6 +55,22 @@ Ship.prototype.tick = function(dt) {
 }
 
 Ship.prototype.attachTo = function(anchor) {
+	var angle = anchor.directionTo(this);
+	var offset = PolarToRectangular(angle, anchor.radius + 10);
+	var planetPosition = anchor.getPosition();
+	var position = new b2Vec2(planetPosition.x + offset.x, planetPosition.y + offset.y);
+	this.body.SetPositionAndAngle(position, angle);
+
+	var jointDef = new Box2D.Dynamics.Joints.b2WeldJointDef;
+
+	jointDef.Initialize(this.body, anchor.body, new b2Vec2(0, 0));
+
+	//jointDef.collideConnected = true;
+
+	this.weld = game.world.CreateJoint(jointDef);
+
+	return;
+
 	if(this.nodes.length) {
 		this.otherPlanet = this.nodes[0].anchor;
 		this.ropeDelayRemaining = this.ROPE_TENSIONING_DELAY;
@@ -147,13 +163,18 @@ Ship.prototype.beAffectedByGravity = function(dt) {
 		force.y += rect.y;
 	}
 
+	return;
+
 	this.addForce(force);
 };
 
 Ship.prototype.draw = function(dt) {
 	Pawn.prototype.draw.call(this, dt);
 
-	this.game.ctx.drawImageRotated(this.image, this.x, this.y, this.angle);
+	var position = this.getPosition();
+	this.game.ctx.drawSprite(this.image, position.x, position.y, this.getAngle());
+
+	return;
 
 	if(this.nodes.length)
 		this.drawRope(dt);
@@ -172,6 +193,14 @@ Ship.prototype.drawRope = function(dt) {
 }
 
 Ship.prototype.fire = function(targetVelocity) {
+	this.game.world.DestroyJoint(this.weld);
+	this.weld = null;
+
+	var force = PolarToRectangular(this.getAngle(), targetVelocity);
+	this.body.ApplyImpulse(force, this.getPosition());
+
+	this.body.SetAngularVelocity(0);
+	return;
 	var node = new RopeSegment(game, this.x, this.y);
 	node.attachTo(this.anchor);
 
@@ -195,9 +224,24 @@ Ship.prototype.checkForCollisions = function () {
 	};
 }
 
-Ship.prototype.collide = function(planet) {
-	if (planet == null) return;
-	this.attachTo(planet);
+Ship.prototype.createBody = function(x, y) {
+	var fixDef = new b2FixtureDef();
+	fixDef.density = 0.1;
+	fixDef.friction = 0.5;
+	fixDef.restitution = 0.2;
+
+	fixDef.shape = new b2CircleShape(10);
+
+	var bodyDef = new b2BodyDef();
+	bodyDef.type = b2Body.b2_dynamicBody;
+	bodyDef.position.x = x;
+	bodyDef.position.y = y;
+	
+	this.body = this.game.world.CreateBody(bodyDef);
+	this.fixture = this.body.CreateFixture(fixDef);
 }
 
-MixInto(Ship.prototype, Attachable);
+//Ship.prototype.collide = function(planet) {
+//	if (planet == null) return;
+//	this.attachTo(planet);
+//}

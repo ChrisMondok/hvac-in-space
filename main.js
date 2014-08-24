@@ -1,3 +1,14 @@
+var b2Vec2 = Box2D.Common.Math.b2Vec2,
+	b2BodyDef = Box2D.Dynamics.b2BodyDef,
+	b2Body = Box2D.Dynamics.b2Body,
+	b2FixtureDef = Box2D.Dynamics.b2FixtureDef,
+	b2Fixture = Box2D.Dynamics.b2Fixture,
+	b2World = Box2D.Dynamics.b2World,
+	b2MassData = Box2D.Collision.Shapes.b2MassData,
+	b2PolygonShape = Box2D.Collision.Shapes.b2PolygonShape,
+	b2CircleShape = Box2D.Collision.Shapes.b2CircleShape,
+	b2DebugDraw = Box2D.Dynamics.b2DebugDraw;
+
 function init() {
 	var canvas = document.querySelector('canvas');
 
@@ -56,13 +67,13 @@ function MixInto(destination, mixin) {
 }
 
 function RectangularToPolar(deltaX, deltaY) {
-	return Math.atan2(-deltaY, deltaX);
+	return Math.atan2(deltaY, deltaX);
 }
 
 function PolarToRectangular(direction, magnitude) {
 	return {
 		x: magnitude * Math.cos(direction),
-		y: - magnitude * Math.sin(direction)
+		y: magnitude * Math.sin(direction)
 	};
 }
 

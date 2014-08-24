@@ -22,6 +22,18 @@ function Game() {
 
 	this.screenScale = 1;
 	this.screenTopLeft = {x: 0, y: 0};
+
+	this.world = new b2World(new b2Vec2(0, 0),true);
+
+	var debugDraw = new b2DebugDraw();
+		debugDraw.SetSprite(this.ctx);
+		debugDraw.SetDrawScale(30.0);
+		debugDraw.SetFillAlpha(0.3);
+		debugDraw.SetLineThickness(1.0);
+		debugDraw.SetFlags(b2DebugDraw.e_shapeBit | b2DebugDraw.e_jointBit);
+	this.world.SetDebugDraw(debugDraw);
+
+	this.debugDraw = debugDraw;
 }
 
 Game.prototype.timeScale = 1;
@@ -60,11 +72,14 @@ Game.prototype.tick = function() {
 
 	for(var i = 0; i < planets.length - 1; i++) {
 		for(var j = i + 1; j < planets.length; j++) {
-			var gravity = planets[i].getGravity(dt, planets[j]);
-			planets[i].addForce(gravity);
-			planets[j].addForce({x: -gravity.x, y: -gravity.y});
+			var gravity = planets[i].getGravity(planets[j]);
+			planets[i].body.ApplyForce(new b2Vec2(gravity.x, gravity.y), planets[i].getPosition());
+			planets[j].body.ApplyForce(new b2Vec2(-gravity.x, -gravity.y), planets[j].getPosition());
 		}
 	}
+
+	this.world.Step(dt, 8, 3);
+	this.world.ClearForces();
 
 	this.draw(dt);
 
@@ -87,12 +102,13 @@ Game.prototype.draw = function(dt) {
 	this.instances[Pawn.name].forEach(function(pawn) {
 		pawn.draw(dt);
 	});
-
 	this.ctx.restore();
 
 	this.ctx.textAlign = 'right';
 	this.ctx.fillStyle = '#FFF';
 	this.ctx.fillText(Math.floor(this.timeScale/dt), this.canvas.width - 32, 32);
+
+	this.world.DrawDebugData(this.debugDraw);
 };
 
 Game.prototype.centerShips = function(dt) {
@@ -103,13 +119,15 @@ Game.prototype.centerShips = function(dt) {
 		for(var i = 0; i < ships.length; i++) {
 			var ship = ships[i];
 
+			var shipPosition = ship.getPosition();
+			var shipVelocity = ship.body.GetLinearVelocity();
 			if(ship.anchor)
-				direction = ship.angle;
+				direction = ship.getAngle();
 			else
-				direction = RectangularToPolar(ship.velocity.x, ship.velocity.y);
+				direction = RectangularToPolar(shipVelocity.x, shipVelocity.y);
 
 			var offset = PolarToRectangular(direction, ship.focalDistance);
-			var focalPoint = {x: ship.x + offset.x, y: ship.y + offset.y};
+			var focalPoint = {x: shipPosition.x + offset.x, y: shipPosition.y + offset.y};
 			center.x += focalPoint.x;
 			center.y += focalPoint.y;
 		}
@@ -124,7 +142,7 @@ Game.prototype.centerShips = function(dt) {
 
 	this.screenTopLeft = {
 		x: -center.x + this.canvas.width/2,
-		y: -center.y + this.canvas.height/2
+		y: center.y + this.canvas.height/2
 	};
 
 	this.ctx.translate(this.screenTopLeft.x, this.screenTopLeft.y);
