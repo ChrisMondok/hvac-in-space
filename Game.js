@@ -40,6 +40,13 @@ Game.prototype.addPawn = function(pawn) {
 	}
 }
 
+Game.prototype.removePawn = function(pawn) {
+	for(var typeName in this.instances) {
+		if(pawn instanceof types[typeName])
+			this.instances[typeName].splice(this.instances[typeName].indexOf(pawn), 1);
+	}
+}
+
 Game.prototype.tick = function() {
 	var now = new Date();
 	var dt = (now - this.lastTick)/1000 * this.timeScale;

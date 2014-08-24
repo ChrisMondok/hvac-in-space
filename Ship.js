@@ -36,16 +36,28 @@ Ship.prototype.tick = function(dt) {
 Ship.prototype.adjustRope = function() {
 	for(var i = 1; i < this.nodes.length; i++)
 	{
-		var thisNode = this.nodes[i];
+		thisNode = this.nodes[i];
 		var previousNode = this.nodes[i-1];
+
+		if(thisNode.anchor && thisNode.anchor != this.nodes[0].anchor) {
+			this.destroyRope();
+			break;
+		}
 
 		if(thisNode.distanceTo(previousNode) > this.NODE_DISTANCE) {
 			var direction = previousNode.directionTo(thisNode);
 			var offset = PolarToRectangular(direction, this.NODE_DISTANCE);
 
+
 			thisNode.x = previousNode.x + offset.x;
 			thisNode.y = previousNode.y + offset.y;
 		}
+	}
+}
+
+Ship.prototype.destroyRope = function() {
+	while(this.nodes.length) {
+		this.nodes.pop().destructor();
 	}
 }
 

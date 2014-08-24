@@ -33,3 +33,22 @@ function ShipTest() {
 
 	ship.attachTo(earth);
 }
+
+function LassoTest() {
+	var a = new Planet(game, 100, 200);
+	var b = new Planet(game, 800, 200);
+
+	var c = new Planet(game, 450, 600);
+
+	ship = new Ship(game, 300,200);
+	window.ship = ship;
+
+	ship.attachTo(a);
+
+	ship.fire(100);
+
+	c.velocity = {x:0, y: -100};
+
+	window.c = c;
+
+}
