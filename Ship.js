@@ -31,6 +31,8 @@ Ship.prototype.tick = function(dt) {
 	if(!this.anchor)
 		this.beAffectedByGravity(dt);
 
+	this.emitParticles(dt);
+
 }
 
 Ship.prototype.adjustRope = function() {
@@ -142,4 +144,26 @@ Ship.prototype.collide = function(planet) {
 	this.attachTo(planet);
 }
 
+Ship.prototype.emitParticles = function(dt) {
+		this.timeBetweenParticles -= dt * 10000;
+		if (this.timeBetweenParticles < 0){
+			this.timeBetweenParticles += 1000;
+			new Particle(
+					game, 
+					Particle.linearFade, 
+					{
+						x:this.x - 5, 
+						y:this.y - 5
+					}, 
+					{
+						x:-1, 
+						y:Math.random()*.3 - 0.15
+					}, 
+					1,
+					{
+						color:'hsl(' + Math.floor(Math.random()*50+130) + ', 100%, 50%)'
+					}
+			);
+		}
+}
 MixInto(Ship.prototype, Attachable);
