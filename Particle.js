@@ -36,3 +36,14 @@ Particle.prototype.draw = function(dt) {
 Particle.prototype.destructor = function() {
 	return this.game.particles.splice(this.game.particles.indexOf(this), 1);
 }
+
+Particle.linearFade = function(dt) {
+	this.game.ctx.save();
+	this.game.ctx.globalAlpha = (this.duration / this.initialDuration);
+	//this.game.ctx.drawImage(images.sun, this.position.x, this.position.y, 20, 20);
+	this.game.ctx.fillStyle = '#DDDDDD';
+	this.game.ctx.beginPath();
+	this.game.ctx.arc(this.position.x, this.position.y, 10, 0, Math.PI * 2);
+	this.game.ctx.fill();
+	this.game.ctx.restore();
+}

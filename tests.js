@@ -47,3 +47,15 @@ function SolarSystemTest(numPlanets) {
 		planet.orbitBody(sun);
 	}
 }
+
+function ParticleGeneratorTest() {
+
+	var ship = new Ship(game, 200, 200);
+	ship.timeBetweenParticles = 1000;
+	ship.tick = function(dt) {
+		Ship.prototype.tick.call(this,dt);
+	};
+
+	ship.velocity = {x:50, y:0};
+}
+
