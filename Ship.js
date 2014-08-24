@@ -16,6 +16,8 @@ Ship.prototype.distanceSinceLastNode = 0;
 
 Ship.prototype.image = images.ship;
 
+Ship.prototype.focalDistance = 0;
+
 Ship.prototype.tick = function(dt) {
 	Pawn.prototype.tick.call(this,dt);
 
@@ -72,9 +74,7 @@ Ship.prototype.beAffectedByGravity = function(dt) {
 		force.y += rect.y;
 	}
 
-	//this works because we're treating mass as 1. I think.
-	this.velocity.x += force.x;
-	this.velocity.y += force.y;
+	this.addForce(force);
 };
 
 Ship.prototype.draw = function(dt) {
@@ -89,6 +89,7 @@ Ship.prototype.draw = function(dt) {
 Ship.prototype.drawRope = function(dt) {
 	var ctx = this.game.ctx;
 	ctx.strokeStyle = "#FFFFFF";
+	ctx.lineJoin = "round";
 	ctx.lineWidth = 8;
 	ctx.beginPath();
 	this.nodes.forEach(function(n) { ctx.lineTo(n.x, n.y); });

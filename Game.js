@@ -94,8 +94,17 @@ Game.prototype.centerShips = function(dt) {
 
 	if(ships.length) {
 		for(var i = 0; i < ships.length; i++) {
-			center.x += ships[i].x;
-			center.y += ships[i].y;
+			var ship = ships[i];
+
+			if(ship.anchor)
+				direction = ship.angle;
+			else
+				direction = RectangularToPolar(ship.velocity.x, ship.velocity.y);
+
+			var offset = PolarToRectangular(direction, ship.focalDistance);
+			var focalPoint = {x: ship.x + offset.x, y: ship.y + offset.y};
+			center.x += focalPoint.x;
+			center.y += focalPoint.y;
 		}
 
 		center.x /= ships.length;
