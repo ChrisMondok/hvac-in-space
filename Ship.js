@@ -47,6 +47,11 @@ Ship.prototype.tick = function(dt) {
 
 		if(this.charging) {
 			this.charge += dt/2;
+			if(this.charge > 1) {
+				this.charging = false;
+				this.charge = 0;
+				//TODO: play a sound
+			}
 		}
 		else {
 			if(this.charge)
