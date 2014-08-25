@@ -262,14 +262,15 @@ Ship.prototype.draw = function(dt) {
 
 	this.drawWheel(dt);
 
-	if(this.nodes.length)
-		this.drawRope(dt);
-	if(this.winching)
-		this.drawWinch(dt);
 
 	var img = this.getImage();
 
 	ctx.drawImageRotated(img, this.x, this.y, this.angle);
+
+	if(this.nodes.length)
+		this.drawRope(dt);
+	if(this.winching)
+		this.drawWinch(dt);
 
 	ctx.lineWidth = 12;
 	ctx.strokeStyle = 'white';
@@ -327,16 +328,12 @@ Ship.prototype.drawWinch = function(dt) {
 
 	ctx.strokeStyle = 'white';
 
-	var angle, offset;
-
 	ctx.beginPath();
-		angle = this.anchor.directionTo(this.otherPlanet);
-		offset = PolarToRectangular(angle, this.anchor.radius);
-		ctx.moveTo(this.anchor.x + offset.x, this.anchor.y + offset.y);
+	ctx.moveTo(this.x, this.y);
 
-		angle += Math.PI;
-		offset = PolarToRectangular(angle, this.otherPlanet.radius);
-		ctx.lineTo(this.otherPlanet.x + offset.x, this.otherPlanet.y + offset.y);
+	var angle = this.otherPlanet.directionTo(this);
+	var offset = PolarToRectangular(angle, this.otherPlanet.radius);
+	ctx.lineTo(this.otherPlanet.x + offset.x, this.otherPlanet.y + offset.y);
 	ctx.stroke();
 
 }
