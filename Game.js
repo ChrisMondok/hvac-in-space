@@ -93,7 +93,7 @@ Game.prototype.tick = function() {
 			for(var j = i + 1; j < planets.length; j++) {
 				if(planetsShouldInteract(planets[i], planets[j])) {
 					if(planetsCollide(planets[i], planets[j])) {
-						if(this.instances.Ship.some(function(s) {return s.anchor == planets[i] || s.anchor == planets[j]}))
+						if(this.aShipIsTetheringThesePlanets(planets[i], planets[j]))
 							this.mergePlanets(planets[i], planets[j])
 						else
 							console.log("Interplanetary collisions!");
@@ -109,13 +109,19 @@ Game.prototype.tick = function() {
 	}
 })();
 
+Game.prototype.aShipIsTetheringThesePlanets = function(a, b) {
+	return this.instances.Ship.some(function(ship) {
+		return (ship.anchor == a && ship.otherPlanet == b) || (ship.anchor == b && ship.otherPlanet == a);
+	});
+}
+
+
 Game.prototype.mergePlanets = function(a, b) {
-	console.log("Mergin' planets!");
+	playSound(sounds.planetsConnected);
 	if(!a.cluster && !b.cluster) {
 		var cluster = new Cluster(this);
 		cluster.addPlanet(a);
 		cluster.addPlanet(b);
-		playSound(sounds.planetsConnected);
 	}
 	else {
 		if(Boolean(a.cluster) != Boolean(b.cluster)) {
