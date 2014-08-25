@@ -132,12 +132,26 @@ Ship.prototype.keyHandler = function(down, keyEvent) {
 		break;
 	default:
 		if(this.winching && code == keyOrder[keyIndex % 4]) {
-			playSound(sounds.winchPullingIn);
+			switch(keyIndex % 4){
+				case 0:
+					playSound(sounds.winch1);
+					break;
+				case 1:
+					playSound(sounds.winch2);
+					break;
+				case 2:
+					playSound(sounds.winch3);
+					break;
+				case 3:
+					playSound(sounds.winch4);
+					break;
+			}
 			this.winchTick();
 			keyIndex++;
 		}
 	}
 }
+
 
 Ship.prototype.winchTick = function() {
 	this.winchLength -= this.WINCH_TICK_AMOUNT;
