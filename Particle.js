@@ -13,7 +13,6 @@ function Particle(game, drawFunction, position, velocity, duration, properties) 
 	this.duration = duration || NaN;
 	this.initialDuration = this.duration;
 	this.properties = properties;
-	console.log(properties.color);
 
 	game.addParticle(this);
 }
