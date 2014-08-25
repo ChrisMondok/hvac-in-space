@@ -1,10 +1,12 @@
 var Zone = extend(Pawn, function Zone() {
 	Pawn.apply(this, arguments);
+	console.log("go");
 	this.planets = [];
 
 });
 
 Zone.prototype.radius = 500;
+Zone.prototype.radiusFactor = 10;
 
 Zone.prototype.recenter = function() {
 	var x = 0;
@@ -15,14 +17,16 @@ Zone.prototype.recenter = function() {
 		x += planet.x * planet.mass;
 		y += planet.y * planet.mass;
 		totalMass += planet.mass;
-	});
+	},this);
 
 	this.x = x/totalMass;
 	this.y = y/totalMass;
 	//return {x:x/totalMass, y:y/totalMass};
+	
+	//this.radius = Math.sqrt(totalMass) * this.radiusFactor ;
 }
 
-Zone.prototype.isInsideZone = function(pawn) {
+Zone.prototype.containsPlanet = function(pawn) {
 	return this.distanceTo(pawn) < this.radius;
 }
 
@@ -54,6 +58,24 @@ Zone.prototype.draw = function(dt) {
 
 }
 
+Zone.prototype.allInACLuster = function() {
+
+	var firstCluster;
+	for(var i=0; i<this.planets.length; i++) {
+		if(firstCluster == undefined)
+			firstCluster = this.planets[i].cluster;
+		else
+			if(this.planets[i].cluster == firstCluster)
+				continue;
+			else
+				return false;
+
+		if(firstCluster == undefined)
+			return false;
+
+		return true;
+	}
+}
 
 Zone.prototype.tick = function(dt) {
 	
@@ -63,7 +85,7 @@ Zone.prototype.tick = function(dt) {
 
 	var escapedPlanets = [];
 	this.planets.forEach( function(planet) {
-		if(!this.isInsideZone(planet)){
+		if(!this.containsPlanet(planet)){
 			console.log("We lost a planet! Oh noes!");
 			escapedPlanets.push(planet);
 		}
@@ -72,4 +94,9 @@ Zone.prototype.tick = function(dt) {
 	escapedPlanets.forEach(function(planet) {
 		this.planets.splice(this.planets.indexOf(planet), 1);
 	},this);
+
+	if (this.allInACLuster()){
+		console.log("You win!");
+		this.game.win()
+	}
 }
