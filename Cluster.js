@@ -37,10 +37,6 @@ Cluster.prototype.addPlanet = function(planet) {
 	this.velocity.x /= totalMass;
 	this.velocity.y /= totalMass;
 
-	var energies = allPlanetsWeCareAbout.map(function(p) {
-		return {x: p.velocity.x * p.mass, y: p.velocity.y * p.mass};
-	});
-
 	var centerOfMass = positions.reduce(function(a, b) {
 		return {x: a.x + b.x, y: a.y + b.y};
 	});
@@ -66,21 +62,23 @@ Cluster.prototype.addPlanet = function(planet) {
 	}, this);
 };
 
-Cluster.prototype.draw = function(dt) {
+Cluster.prototype.drawConnections = function(dt) {
 	var ctx = this.game.ctx;
 
-	ctx.strokeStyle = "red";
+	ctx.lineWidth = 8;
+	ctx.strokeStyle = "white";
 
-	ctx.beginPath();
-	ctx.moveTo(this.x, this.y);
-
-	this.attachments.forEach(function(a) {
-		ctx.lineTo(a.planet.x, a.planet.y)
-		ctx.lineTo(this.x, this.y);
-	}, this);
-
-	ctx.stroke();
-}
+	for(var i = 0; i < this.attachments.length - 1; i++) {
+		for(var j = i; j < this.attachments.length; j++) {
+			var a = this.attachments[i].planet;
+			var b = this.attachments[j].planet;
+			ctx.beginPath();
+			ctx.moveTo(a.x, a.y);
+			ctx.lineTo(b.x, b.y);
+			ctx.stroke();
+		}
+	}
+};
 
 Cluster.prototype.destructor = function() {
 	this.attachments.forEach(function(a) {

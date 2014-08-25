@@ -96,17 +96,46 @@ Ship.prototype.tick = function(dt) {
 	}
 
 	if(this.winching) {
-		var currentDistance = this.anchor.distanceTo(this.otherPlanet);
+		if(this.winchLineInterctsOtherPlanet())
+		{
+			playSound(sounds.ropeSnap);
+			this.winching = false;
+			this.otherPlanet = null;
+		}
+		else {
+			var currentDistance = this.anchor.distanceTo(this.otherPlanet);
 
-		var anchorAdjust = PolarToRectangular(this.anchor.directionTo(this.otherPlanet), dt * (currentDistance - this.winchLength) / 2);
+			var anchorAdjust = PolarToRectangular(this.anchor.directionTo(this.otherPlanet), dt * (currentDistance - this.winchLength) / 2);
 
-		this.anchor.x += anchorAdjust.x;
-		this.anchor.y += anchorAdjust.y;
+			var anchor = this.anchor.cluster || this.anchor;
+			var other = this.otherPlanet.cluster || this.otherPlanet;
+			anchor.x += anchorAdjust.x;
+			anchor.y += anchorAdjust.y;
 
-		this.otherPlanet.x -= anchorAdjust.x;
-		this.otherPlanet.y -= anchorAdjust.y;
+			other.x -= anchorAdjust.x;
+			other.y -= anchorAdjust.y;
+
+			this.wheelAngle = (currentDistance / 32) * Math.PI;
+		}
 	}
-}
+};
+
+Ship.prototype.winchLineInterctsOtherPlanet = function() {
+	var angle = this.otherPlanet.directionTo(this);
+	var offset = PolarToRectangular(angle, this.otherPlanet.radius);
+
+	var endX = this.otherPlanet.x + offset.x;
+	var endY = this.otherPlanet.y + offset.y;
+
+	return this.game.instances[Planet.name].some(function(planet) {
+		if(planet == this.anchor || planet == this.otherPlanet)
+			return false;
+
+		if(CircleIntersectsLineSegment(planet, this.x, this.y, endX, endY)) {
+			return true;
+		}
+	}, this);
+};
 
 //NOTE! This should be idempotent.
 Ship.prototype.keyHandler = function(down, keyEvent) {
@@ -131,7 +160,7 @@ Ship.prototype.keyHandler = function(down, keyEvent) {
 			this.desiredRotation = down ? -this.MANUAL_ROTATION_SPEED : 0;
 		break;
 	default:
-		if(this.winching && code == keyOrder[keyIndex % 4]) {
+		if(down && this.winching && code == keyOrder[keyIndex % 4]) {
 			switch(keyIndex % 4){
 				case 0:
 					playSound(sounds.winch1);
@@ -315,7 +344,7 @@ Ship.prototype.drawWheel = function(dt) {
 	else
 		var offset = {x:-13, y:21};
 	var wheelImage = images.wheel;
-	this.wheelAngle += (dt);
+	//this.wheelAngle += (dt);
 	var dir = RectangularToPolar(offset.x, offset.y) + this.angle;
 	
 	offset = PolarToRectangular(dir, Magnitude(offset.x, offset.y));
@@ -382,8 +411,17 @@ Ship.prototype.checkForCollisions = function () {
 	};
 }
 
+Ship.prototype.distanceToClosestPlanet = function() {
+	var dist = this.game.instances[Planet.name].map(function(planet) {
+		return this.distanceTo(planet) - planet.radius;
+	}, this).reduce(function(a, b) {return Math.min(a, b);});
+
+	//hooray floating points!
+	return dist >= 0 ? dist : 0;
+}
+
 Ship.prototype.collide = function(planet) {
-	if (planet == null) return;
+	if (!planet) return;
 
 	playSound(sounds.landing);
 

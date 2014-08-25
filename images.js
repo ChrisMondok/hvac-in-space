@@ -4,6 +4,7 @@
 
 	function gotImage(i) {
 		toload.splice(toload.indexOf(i), 1);
+		document.getElementById('image-meter').value = 1-(toload.length / Object.keys(imageHandles).length);
 		if(!toload.length)
 			document.dispatchEvent(new CustomEvent("imagesloaded"));
 	}

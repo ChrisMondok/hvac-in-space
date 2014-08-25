@@ -42,8 +42,7 @@ RopeSegment.prototype.collide = function(planet) {
 }
 
 RopeSegment.prototype.destructor = function() {
-	Pawn.prototype.destructor.call(this);
-	console.log('boom');
+	Pawn.prototype.destructor.apply(this, arguments);
 	for(var i=0; i<8; i++){
 		new Particle(
 				game,

@@ -80,13 +80,25 @@ function ParticleGeneratorTest() {
 	return ship;
 }
 
-
-function AttachmentTest() {
+function ClusterMergeTest() {
 	a = new Planet(game, 200, 200);
-	b = new Planet(game, 400, 200);
+	b = new Planet(game, 450, 200);
 
-	cluster = new Cluster(game, 300, 200);
+	clusterOne = new Cluster(game, 0, 0);
 
-	cluster.addPlanet(a);
-	cluster.addPlanet(b);
+	clusterOne.addPlanet(a);
+	clusterOne.addPlanet(b);
+
+	c = new Planet(game, 200, 500);
+	d = new Planet(game, 450, 500);
+
+	clusterTwo = new Cluster(game);
+	clusterTwo.addPlanet(c);
+	clusterTwo.addPlanet(d);
+
+	clusterTwo.angle = 3/2 * Math.PI;
+
+	ship = new Ship(game, 200, 300);
+	ship.attachTo(a);
+
 }

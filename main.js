@@ -3,11 +3,16 @@ function init() {
 
 	var lastTime = new Date();
 
+}
+
+function startGame() {
 	var game = window.game = new Game();
 
 	function main() {
-		game.tick();
-		requestAnimationFrame(main);
+		if(game) {
+			game.tick();
+			requestAnimationFrame(main);
+		}
 	}
 
 	main();
@@ -75,4 +80,34 @@ function InterpolatePositions(from, to, amount) {
 		x: to.x * amount + from.x * (1 - amount),
 		y: to.y * amount + from.y * (1 - amount) 
 	};
+}
+
+function PointDistance(x1, y1, x2, y2) {
+	return Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2));
+}
+
+//expects "circleLike" to have x, y, and radius
+function CircleIntersectsLineSegment(circleLike, x1, y1, x2, y2) {
+	if(PointDistance(circleLike.x, circleLike.y, x1, y1) < circleLike.radius)
+		return true;
+	
+	if(PointDistance(circleLike.x, circleLike.y, x2, y2) < circleLike.radius)
+		return true;
+
+	var angleToCircle = RectangularToPolar(circleLike.x - x1, circleLike.y - y1)
+	var angleOfLine = RectangularToPolar(x2 - x1, y2 - y1);
+	var lengthOfLine = PointDistance(x1, y1, x2, y2);
+	var distanceFrom1ToCircle = PointDistance(x1, y1, circleLike.x, circleLike.y);
+
+	var whatIsThisCalled = PolarToRectangular(angleToCircle - angleOfLine, distanceFrom1ToCircle);
+
+	var distanceAlongLine = whatIsThisCalled.x;
+	var distanceFromLine = whatIsThisCalled.y;
+
+	if(distanceAlongLine < 0 || distanceAlongLine > lengthOfLine)
+		return false;
+	if(Math.abs(distanceFromLine) > circleLike.radius)
+		return false;
+
+	return true;
 }

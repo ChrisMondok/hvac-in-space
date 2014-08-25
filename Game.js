@@ -24,6 +24,21 @@ function Game() {
 
 	this.screenScale = 1;
 	this.screenTopLeft = {x: 0, y: 0};
+
+	this.startMusic();
+}
+
+Game.prototype.startMusic = function() {
+	this.guitars = getSoundSource(sounds.guitar);
+
+	this.guitarLowPassFilter = audioCtx.createBiquadFilter();
+	this.guitarLowPassFilter.type = 0;
+	this.guitarLowPassFilter.frequency.value = 24000;
+
+	this.guitars.connect(this.guitarLowPassFilter);
+	this.guitarLowPassFilter.connect(audioCtx.destination);
+
+	this.guitars.start(0);
 }
 
 Game.prototype.timeScale = 1;
@@ -33,6 +48,11 @@ Game.prototype.backgroundImage = images.background;
 Game.prototype.destructor = function() {
 	window.removeEventListener('resize', this.resizeListener);
 	this.canvas.parentNode.removeChild(this.canvas);
+
+	this.instances[Pawn.name].slice(0).forEach(function(pawn) {
+		pawn.destructor();
+	}, this);
+	this.guitars.stop();
 }
 
 Game.prototype.addPawn = function(pawn) {
@@ -68,9 +88,32 @@ Game.prototype.tick = function() {
 
 	this.tickPlanets(dt);
 
+	this.filterSounds(dt);
+
 	this.draw(dt);
 
 	this.lastTick = now;
+};
+
+Game.prototype.filterSounds = function() {
+	var planets = this.instances[Planet.name];
+
+	var distances = this.instances[Ship.name].map(function(ship) {
+		return ship.distanceToClosestPlanet();
+	});
+
+	var minDistance = 0;
+	if(distances.length)
+		var minDistance = Math.min.apply(Math, distances);
+
+	var delta = 23000;
+
+	var mul = 1/(minDistance * 0.025 + 1);
+
+	var frequency = 10 + delta * mul;
+
+	this.guitarLowPassFilter.frequency.value = frequency;
+
 };
 
 (function() {
@@ -115,6 +158,21 @@ Game.prototype.aShipIsTetheringThesePlanets = function(a, b) {
 	});
 }
 
+Game.prototype.aShipIsConnectedToThisPlanetSomehow = function(planet) {
+	return this.instances.Ship.some(function(ship) {
+		if(ship.anchor == planet || ship.otherPlanet == planet)
+			return true;
+
+		if(planet.cluster) {
+			if(ship.anchor.cluster == planet.cluster)
+				return true;
+			if(ship.otherPlanet.cluster == planet.cluster)
+				return true;
+		}
+
+	});
+}
+
 
 Game.prototype.mergePlanets = function(a, b) {
 	playSound(sounds.planetsConnected);
@@ -128,8 +186,16 @@ Game.prototype.mergePlanets = function(a, b) {
 			var cluster = a.cluster || b.cluster;
 			var planetNotInCluster = a.cluster ? b : a;
 			cluster.addPlanet(planetNotInCluster);
-		} else
-			console.error("Merging clusters not implemented");
+		} else {
+			var planetsToAddToClusterA = b.cluster.attachments.map(function(a) {
+				return a.planet;
+			});
+
+			b.cluster.destructor();
+			planetsToAddToClusterA.forEach(function(p) {
+				a.cluster.addPlanet(p);
+			});
+		}
 	}
 }
 
@@ -148,6 +214,10 @@ Game.prototype.draw = function(dt) {
 
 	this.particles.forEach(function(particle) {
 		particle.draw(dt);
+	});
+
+	this.instances[Cluster.name].forEach(function(cluster) {
+		cluster.drawConnections(dt);
 	});
 
 	this.instances[Pawn.name].forEach(function(pawn) {
