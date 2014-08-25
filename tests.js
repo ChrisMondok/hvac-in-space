@@ -13,12 +13,16 @@ function TwoBodyTest() {
 }
 
 function SunTest() {
-	var sun = new Planet(game, 1100, 500);
-	sun.mass = 3000000;
-	sun.image = images.sun;
+	var sun = new Star(game, Star.prototype.radius + 1100, 500);
 
 	var earth = new Planet(game, 100, 500);
 	earth.orbitBody(sun);
+
+	window.sun = sun;
+	window.earth = earth;
+
+	var ship = new Ship(game, earth.x, earth.y + 300);
+	ship.attachTo(earth);
 }
 
 function ShipTest() {

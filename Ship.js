@@ -24,7 +24,7 @@ var Ship = extend(Pawn, function Ship() {
 Ship.prototype.NODE_DISTANCE = 64;
 Ship.prototype.MAX_SPEED = 800;
 Ship.prototype.ROPE_TENSIONING_DELAY = 1;
-Ship.prototype.GRAVITY_FUDGE_FACTOR = 2500;
+Ship.prototype.GRAVITY_FUDGE_FACTOR = 250;
 Ship.prototype.WINCH_TICK_AMOUNT = 25;
 Ship.prototype.MANUAL_ROTATION_SPEED = Math.PI/3;
 
@@ -288,7 +288,13 @@ Ship.prototype.beAffectedByGravity = function(dt) {
 	var force = {x: 0, y: 0};
 
 	for(var i = 0; i < planets.length; i++) {
-		var magnitude = this.GRAVITY_FUDGE_FACTOR * dt * (game.CONSTANT_OF_GRAVITY * planets[i].mass)/Math.pow(planets[i].distanceTo(this), 2);
+		var magnitude = dt * (game.CONSTANT_OF_GRAVITY * planets[i].mass)/Math.pow(planets[i].distanceTo(this), 2);
+
+		if(!planets[i] instanceof Star)
+			magnitude *= this.GRAVITY_FUDGE_FACTOR;
+		else
+			magnitude *= this.GRAVITY_FUDGE_FACTOR/2;
+
 		var direction = this.directionTo(planets[i]);
 		
 		var rect = PolarToRectangular(direction, magnitude);
@@ -429,9 +435,14 @@ Ship.prototype.distanceToClosestPlanet = function() {
 Ship.prototype.collide = function(planet) {
 	if (!planet) return;
 
-	playSound(sounds.landing);
+	if(planet instanceof Star) {
+		this.destructor();
+	}
+	else {
+		playSound(sounds.landing);
 
-	this.attachTo(planet);
+		this.attachTo(planet);
+	}
 }
 
 Ship.prototype.emitParticles = function(dt) {

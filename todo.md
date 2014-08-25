@@ -8,8 +8,7 @@ Important
 [x] Breaking the tether in the winching state
 [x] Winching should affect clusters, not just planets
 [ ] Winning
-[ ] Losing
-[ ] Zooming
+[x] Zooming
 
 Less important but still important
 ==================================

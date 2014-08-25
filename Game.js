@@ -26,10 +26,23 @@ function Game() {
 	this.screenTopLeft = {x: 0, y: 0};
 
 	this.startMusic();
+
+	this.keyListener = this.keyHandler.bind(this);
+	document.addEventListener('keypress', this.keyListener);
+}
+
+Game.prototype.keyHandler = function(keyEvent) {
+	var code = keyEvent.which || keyEvent.keyCode;
+
+	if(code == 43 || code == 61) //plus, equals
+		this.screenScale = Math.min(this.screenScale + 0.1, 1);
+	if(code == 45) //minus
+		this.screenScale = Math.max(this.screenScale - 0.1, 0.1)
 }
 
 Game.prototype.startMusic = function() {
 	this.guitars = getSoundSource(sounds.guitar);
+	this.guitars.loop = true;
 
 	this.guitarLowPassFilter = audioCtx.createBiquadFilter();
 	this.guitarLowPassFilter.type = 0;
@@ -39,12 +52,14 @@ Game.prototype.startMusic = function() {
 	this.guitarLowPassFilter.connect(audioCtx.destination);
 
 	this.notWinchingDrums = getSoundSource(sounds.smallDrums);
+	this.notWinchingDrums.loop = true;
 	
 	this.notWinchingGainNode = audioCtx.createGain();
 	this.notWinchingDrums.connect(this.notWinchingGainNode);
 	this.notWinchingGainNode.connect(audioCtx.destination);
 
 	this.winchingDrums = getSoundSource(sounds.drumsAndBass);
+	this.winchingDrums.loop = true;
 	
 	this.winchingGainNode = audioCtx.createGain();
 	this.winchingDrums.connect(this.winchingGainNode);
@@ -52,9 +67,9 @@ Game.prototype.startMusic = function() {
 
 	this.winchingGainNode.gain.value = 0;
 
-	this.guitars.start(0);
-	this.notWinchingDrums.start(0);
-	this.winchingDrums.start(0);
+//	this.guitars.start(0);
+//	this.notWinchingDrums.start(0);
+//	this.winchingDrums.start(0);
 }
 
 Game.prototype.timeScale = 1;
@@ -65,10 +80,14 @@ Game.prototype.destructor = function() {
 	window.removeEventListener('resize', this.resizeListener);
 	this.canvas.parentNode.removeChild(this.canvas);
 
+	document.addEventListener('keypress', this.keyListener);
+
 	this.instances[Pawn.name].slice(0).forEach(function(pawn) {
 		pawn.destructor();
 	}, this);
 	this.guitars.stop();
+	this.notWinchingDrums.stop();
+	this.winchingDrums.stop();
 }
 
 Game.prototype.addPawn = function(pawn) {
@@ -243,6 +262,8 @@ Game.prototype.draw = function(dt) {
 	this.ctx.fillStyle = this.starPattern;
 	this.ctx.fillRect(-this.screenTopLeft.x, -this.screenTopLeft.y, this.canvas.width, this.canvas.height);
 
+	this.ctx.scale(this.screenScale, this.screenScale);
+
 	this.particles.forEach(function(particle) {
 		particle.draw(dt);
 	});
@@ -263,10 +284,10 @@ Game.prototype.draw = function(dt) {
 };
 
 Game.prototype.centerShips = function(dt) {
-	var center = {x: 0, y: 0};
 	var ships = this.instances[Ship.name];
 
 	if(ships.length) {
+		var center = {x: 0, y: 0};
 		for(var i = 0; i < ships.length; i++) {
 			var ship = ships[i];
 
@@ -283,16 +304,13 @@ Game.prototype.centerShips = function(dt) {
 
 		center.x /= ships.length;
 		center.y /= ships.length;
-	}
-	else {
-		center.x = this.canvas.width/2;
-		center.y = this.canvas.height/2;
-	}
 
-	this.screenTopLeft = {
-		x: -center.x + this.canvas.width/2,
-		y: -center.y + this.canvas.height/2
-	};
+		this.screenTopLeft = {
+			x: -center.x * this.screenScale + this.canvas.width/2,
+			y: -center.y * this.screenScale + this.canvas.height/2
+		};
+
+	}
 
 	this.ctx.translate(this.screenTopLeft.x, this.screenTopLeft.y);
 };
@@ -307,4 +325,4 @@ Game.prototype.getPlanets = function() {
 	return this.instances[Planet.name];
 }
 
-Game.prototype.CONSTANT_OF_GRAVITY = 1;
+Game.prototype.CONSTANT_OF_GRAVITY = 10;
