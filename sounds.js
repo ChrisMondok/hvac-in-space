@@ -53,11 +53,19 @@ var soundHandles = {
 	liftoff: "sounds/sfx/liftoff.ogg",
 	planetsCollide: "sounds/sfx/planets-collide.ogg",
 	planetsConnected: "sounds/sfx/planets-connected.ogg",
-	ropeSnap: "sounds/sfx/rope-snap.ogg",
+	ropeSnap: "sounds/sfx/rope snap.ogg",
 	selectBonusPoints: "sounds/sfx/select-bonus-points.ogg",
 	selectBonusPoints2: "sounds/sfx/select-bonus-points-2.ogg",
 	winchLettingOut: "sounds/sfx/winch-letting-out.ogg",
-	winchPullingIn: "sounds/sfx/winch-pulling-in.ogg"
+	winchPullingIn: "sounds/sfx/winch-pulling-in.ogg",
+	powerUp: "sounds/sfx/powering uuuuup.ogg",
+
+	/* Winch sfx */
+	winch1: "sounds/sfx/winch 1.ogg",
+	winch2: "sounds/sfx/winch 2.ogg",
+	winch3: "sounds/sfx/winch 3.ogg",
+	winch4: "sounds/sfx/winch 4.ogg",
+
 }
 
 for(var name in soundHandles) {
