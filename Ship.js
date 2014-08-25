@@ -31,6 +31,8 @@ Ship.prototype.image = images.ship;
 Ship.prototype.focalDistance = 0;
 Ship.prototype.wheelAngle = 0;
 
+Ship.prototype.timeBetweenParticles = 1000;
+
 Ship.prototype.tick = function(dt) {
 	Pawn.prototype.tick.call(this,dt);
 
@@ -68,6 +70,8 @@ Ship.prototype.tick = function(dt) {
 		this.beAffectedByGravity(dt);
 
 		this.adjustRopeInSpace(dt);
+
+		this.emitParticles(dt);
 	}
 
 	if(this.winching) {
