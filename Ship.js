@@ -2,11 +2,21 @@ var Ship = extend(Pawn, function Ship() {
 	Pawn.apply(this, arguments)
 	this.nodes = [];
 	this.winching = false;
+
+	this.keyDownListener = this.keyHandler.bind(this, true);
+	this.keyUpListener = this.keyHandler.bind(this, false);
+
+	document.addEventListener('keydown', this.keyDownListener);
+	document.addEventListener('keyup', this.keyUpListener);
+
+	this.charge = 0;
+	this.charging = false;
 });
 
 Ship.prototype.NODE_DISTANCE = 64;
-
+Ship.prototype.MAX_SPEED = 800;
 Ship.prototype.ROPE_TENSIONING_DELAY = 1;
+Ship.prototype.GRAVITY_FUDGE_FACTOR = 2500;
 
 Ship.prototype.planet = undefined;
 
@@ -34,8 +44,17 @@ Ship.prototype.tick = function(dt) {
 			this.otherPlanet.angularVelocity = 0;
 			this.anchor.angularVelocity = 0;
 		}
+
+		if(this.charging) {
+			this.charge += dt/2;
+		}
+		else {
+			if(this.charge)
+				this.fire(this.charge * this.MAX_SPEED);
+		}
 	}
 	else {
+		this.charge = 0;
 		if(this.nodes.length){
 			if(this.weAreTooFarFromThePreviousNode())
 				this.nodes.push(new RopeSegment(game, this.x, this.y));
@@ -51,6 +70,14 @@ Ship.prototype.tick = function(dt) {
 		var forceMagnitude = 10000 * dt;
 		this.anchor.addForce(PolarToRectangular(forceDirection, forceMagnitude));
 		this.otherPlanet.addForce(PolarToRectangular(forceDirection + Math.PI, forceMagnitude));
+	}
+}
+
+Ship.prototype.keyHandler = function(down, keyEvent) {
+	switch(keyEvent.which || keyEvent.keyCode) {
+	case 32:
+		this.charging = down && this.anchor;
+		break;
 	}
 }
 
@@ -134,18 +161,20 @@ Ship.prototype.weAreTooFarFromThePreviousNode = function() {
 }
 
 Ship.prototype.destructor = function() {
+	document.removeEventListener('keydown', this.keyDownListener);
+	document.removeEventListener('keyup', this.keyUpListener);
+
 	Pawn.prototype.destructor.apply(this, arguments);
-	this.nodes.forEach(function(n) {
-		n.destructor();
-	});
+
+	this.nodes.forEach(function(n) { n.destructor(); });
 }
 
 Ship.prototype.beAffectedByGravity = function(dt) {
 	var planets = game.instances[Planet.name];
 	var force = {x: 0, y: 0};
-	
+
 	for(var i = 0; i < planets.length; i++) {
-		var magnitude = dt * (game.CONSTANT_OF_GRAVITY * planets[i].mass)/Math.pow(planets[i].distanceTo(this), 2);
+		var magnitude = this.GRAVITY_FUDGE_FACTOR * dt * (game.CONSTANT_OF_GRAVITY * planets[i].mass)/Math.pow(planets[i].distanceTo(this), 2);
 		var direction = this.directionTo(planets[i]);
 		
 		var rect = PolarToRectangular(direction, magnitude);
@@ -159,11 +188,21 @@ Ship.prototype.beAffectedByGravity = function(dt) {
 Ship.prototype.draw = function(dt) {
 	Pawn.prototype.draw.call(this, dt);
 
+	var ctx = this.game.ctx;
+
 	this.drawWheel(dt);
-	this.game.ctx.drawImageRotated(this.image, this.x, this.y, this.angle);
 
 	if(this.nodes.length)
 		this.drawRope(dt);
+
+	ctx.drawImageRotated(this.image, this.x, this.y, this.angle);
+
+	ctx.lineWidth = 12;
+	ctx.strokeStyle = 'white';
+	ctx.beginPath();
+	if(this.charge)
+		ctx.arc(this.x, this.y, 48, - Math.PI/2, - Math.PI/2 + Math.PI * 2 * this.charge, false);	
+	ctx.stroke();
 }
 
 Ship.prototype.drawWheel = function(dt) {

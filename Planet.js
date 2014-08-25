@@ -6,6 +6,8 @@ Planet.prototype.image = images.bluePlanet;
 
 Planet.prototype.radius = 100;
 
+Planet.prototype.cluster = null;
+
 Planet.prototype.getGravity = function(dt, otherPlanet) {
 	if(!(this.mass && otherPlanet.mass))
 		throw new RangeError('Both bodies must have mass!');
@@ -21,6 +23,13 @@ Planet.prototype.draw = function(dt) {
 
 	var ctx = this.game.ctx;
 	ctx.drawImageRotated(this.image, this.x, this.y, this.angle);
+}
+
+Planet.prototype.addForce = function() {
+	if(this.cluster)
+		this.cluster.addForce.apply(this.cluster, arguments);
+	else
+		Pawn.prototype.addForce.apply(this, arguments);
 }
 
 Planet.prototype.orbitBody = function(otherBody, clockwise) {

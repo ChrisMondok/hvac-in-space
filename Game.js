@@ -73,23 +73,48 @@ Game.prototype.tick = function() {
 	this.lastTick = now;
 };
 
-Game.prototype.tickPlanets = function(dt) {
-	var planets = this.instances[Planet.name];
+(function() {
+	var planetsCollide = function(a, b) {
+		return a.distanceTo(b) < a.radius + b.radius
+	}
 
-	for(var i = 0; i < planets.length - 1; i++) {
-		for(var j = i + 1; j < planets.length; j++) {
-			if(planets[i].distanceTo(planets[j]) < planets[i].radius + planets[j].radius) {
-				if(this.instances.Ship.some(function(s) {return s.anchor == planets[i] || s.anchor == planets[j]}))
-					console.log("Stick 'em together");
-				else
-					console.log("Interplanetary collisions!");
-			}
-			else {
-				var gravity = planets[i].getGravity(dt, planets[j]);
-				planets[i].addForce(gravity);
-				planets[j].addForce({x: -gravity.x, y: -gravity.y});
+	var planetsShouldInteract = function(a, b) {
+		if(a.cluster && b.cluster) {
+			return a.cluster != b.cluster;
+		}
+		else
+			return true;
+	}
+
+	Game.prototype.tickPlanets = function(dt) {
+		var planets = this.instances[Planet.name];
+
+		for(var i = 0; i < planets.length - 1; i++) {
+			for(var j = i + 1; j < planets.length; j++) {
+				if(planetsShouldInteract(planets[i], planets[j])) {
+					if(planetsCollide(planets[i], planets[j])) {
+						if(this.instances.Ship.some(function(s) {return s.anchor == planets[i] || s.anchor == planets[j]}))
+							this.mergePlanets(planets[i], planets[j])
+						else
+							console.log("Interplanetary collisions!");
+					}
+					else {
+						var gravity = planets[i].getGravity(dt, planets[j]);
+						planets[i].addForce(gravity);
+						planets[j].addForce({x: -gravity.x, y: -gravity.y});
+					}
+				}
 			}
 		}
+	}
+})();
+
+Game.prototype.mergePlanets = function(a, b) {
+	console.log("Mergin' planets!");
+	if(!a.cluster && !b.cluster) {
+		var cluster = new Cluster(this);
+		cluster.addPlanet(a);
+		cluster.addPlanet(b);
 	}
 }
 

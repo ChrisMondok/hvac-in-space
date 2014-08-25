@@ -5,6 +5,8 @@ function TwoBodyTest() {
 	a.angularVelocity = 1;
 	b.angularVelocity = -1.5;
 	ship = new Ship(game, 100,100);
+	window.a = a;
+	window.b = b;
 	window.ship = ship;
 
 	ship.attachTo(a);
@@ -77,3 +79,13 @@ function ParticleGeneratorTest() {
 	ship.velocity = {x:50, y:0};
 }
 
+
+function AttachmentTest() {
+	a = new Planet(game, 200, 200);
+	b = new Planet(game, 400, 200);
+
+	cluster = new Cluster(game, 300, 200);
+
+	cluster.addPlanet(a);
+	cluster.addPlanet(b);
+}
