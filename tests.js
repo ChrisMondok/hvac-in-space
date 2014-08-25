@@ -50,7 +50,7 @@ function LassoTest() {
 
 	ship.attachTo(a);
 
-	ship.fire(100);
+	ship.fire(1000);
 
 	c.velocity = {x:0, y: -100};
 }

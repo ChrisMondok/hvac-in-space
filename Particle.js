@@ -46,7 +46,7 @@ Particle.linearFade = function(dt) {
 	//this.game.ctx.drawImage(images.sun, this.position.x, this.position.y, 20, 20);
 	this.game.ctx.fillStyle = this.properties.color;
 	this.game.ctx.beginPath();
-	this.game.ctx.arc(this.position.x, this.position.y, 10, 0, Math.PI * 2);
+	this.game.ctx.arc(this.position.x, this.position.y, this.properties.radius, 0, Math.PI * 2);
 	this.game.ctx.fill();
 	this.game.ctx.restore();
 }

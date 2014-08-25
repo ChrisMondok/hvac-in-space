@@ -296,12 +296,13 @@ Ship.prototype.emitParticles = function(dt) {
 						y:this.y
 					}, 
 					{
-						x:(-1 * this.velocity.x/6) + Math.random()*.3 - .15, 
-						y:(-1 * this.velocity.y/6) + Math.random()*.3 - .15
+						x:(-1 * dt * this.velocity.x/6) + Math.random()*.3 - .15, 
+						y:(-1 * dt * this.velocity.y/6) + Math.random()*.3 - .15
 					}, 
 					1,
 					{
-						color:'hsl(' + Math.floor(Math.random()*50+130) + ', 100%, 50%)'
+						color:'hsl(' + Math.floor(Math.random()*50+130) + ', 100%, 50%)',
+						radius:10
 					}
 			);
 		}
