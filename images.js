@@ -28,7 +28,11 @@ var imageHandles = {
 	shipTop: "images/ship_topdown.png",
 	background: "images/spacebg.png",
 	stars: "images/background.png",
-	wheel: "images/winch_wheel.png"
+	wheel: "images/winch_wheel.png",
+	zxcvZ: "images/zxcv_z.png",
+	zxcvX: "images/zxcv_x.png",
+	zxcvC: "images/zxcv_c.png",
+	zxcvV: "images/zxcv_v.png",
 };
 
 for(var name in imageHandles) {

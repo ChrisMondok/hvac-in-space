@@ -38,7 +38,23 @@ Game.prototype.startMusic = function() {
 	this.guitars.connect(this.guitarLowPassFilter);
 	this.guitarLowPassFilter.connect(audioCtx.destination);
 
+	this.notWinchingDrums = getSoundSource(sounds.smallDrums);
+	
+	this.notWinchingGainNode = audioCtx.createGain();
+	this.notWinchingDrums.connect(this.notWinchingGainNode);
+	this.notWinchingGainNode.connect(audioCtx.destination);
+
+	this.winchingDrums = getSoundSource(sounds.drumsAndBass);
+	
+	this.winchingGainNode = audioCtx.createGain();
+	this.winchingDrums.connect(this.winchingGainNode);
+	this.winchingGainNode.connect(audioCtx.destination);
+
+	this.winchingGainNode.gain.value = 0;
+
 	this.guitars.start(0);
+	this.notWinchingDrums.start(0);
+	this.winchingDrums.start(0);
 }
 
 Game.prototype.timeScale = 1;
@@ -92,7 +108,22 @@ Game.prototype.tick = function() {
 
 	this.draw(dt);
 
+	if(this.aShipIsWinching()) {
+		this.winchingGainNode.gain.value = 1;
+		this.notWinchingGainNode.gain.value = 0;
+	}
+	else {
+		this.winchingGainNode.gain.value = 0;
+		this.notWinchingGainNode.gain.value = 1;
+	}
+
 	this.lastTick = now;
+};
+
+Game.prototype.aShipIsWinching = function() {
+	return this.instances[Ship.name].some(function(ship) {
+		return Boolean(ship.otherPlanet);
+	});
 };
 
 Game.prototype.filterSounds = function() {

@@ -1,5 +1,4 @@
 var keyOrder = [90, 88, 67, 86];
-var keyIndex = 0;
 
 var Ship = extend(Pawn, function Ship() {
 	Pawn.apply(this, arguments)
@@ -18,6 +17,8 @@ var Ship = extend(Pawn, function Ship() {
 	this.lastWinchKey = 86;
 
 	this.desiredRotation = 0;
+
+	this.keyIndex = 0;
 });
 
 Ship.prototype.NODE_DISTANCE = 64;
@@ -160,8 +161,8 @@ Ship.prototype.keyHandler = function(down, keyEvent) {
 			this.desiredRotation = down ? -this.MANUAL_ROTATION_SPEED : 0;
 		break;
 	default:
-		if(down && this.winching && code == keyOrder[keyIndex % 4]) {
-			switch(keyIndex % 4){
+		if(down && this.winching && code == keyOrder[this.keyIndex % 4]) {
+			switch(this.keyIndex % 4){
 				case 0:
 					playSound(sounds.winch1);
 					break;
@@ -176,7 +177,7 @@ Ship.prototype.keyHandler = function(down, keyEvent) {
 					break;
 			}
 			this.winchTick();
-			keyIndex++;
+			this.keyIndex++;
 		}
 	}
 }
@@ -366,6 +367,11 @@ Ship.prototype.drawRope = function(dt) {
 
 Ship.prototype.drawWinch = function(dt) {
 	var ctx = this.game.ctx;
+
+	var keyImage = [images.zxcvZ, images.zxcvX, images.zxcvC, images.zxcvV][this.keyIndex % 4];
+
+	ctx.drawImage(keyImage, this.x - keyImage.width/2, this.y - keyImage.height/2);
+
 	ctx.lineWidth = 8;
 	ctx.lineCap = 'butt';
 

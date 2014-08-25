@@ -42,7 +42,7 @@
 
 		/* In-game tracks */
 		guitar: "sounds/sleepy guitars only.ogg",
-		smallDrums: "sounds/sleepy no bass smaller drums.ogg",
+		smallDrums: "sounds/sleepy only smaller drums.ogg",
 		drumsAndBass: "sounds/sleepy only bass and bigger drums.ogg",
 
 		/* SFX */
