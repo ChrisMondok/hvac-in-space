@@ -115,6 +115,15 @@ Game.prototype.mergePlanets = function(a, b) {
 		var cluster = new Cluster(this);
 		cluster.addPlanet(a);
 		cluster.addPlanet(b);
+		playSound(sounds.planetsConnected);
+	}
+	else {
+		if(Boolean(a.cluster) != Boolean(b.cluster)) {
+			var cluster = a.cluster || b.cluster;
+			var planetNotInCluster = a.cluster ? b : a;
+			cluster.addPlanet(planetNotInCluster);
+		} else
+			console.error("Merging clusters not implemented");
 	}
 }
 

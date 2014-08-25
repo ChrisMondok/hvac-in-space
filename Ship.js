@@ -1,3 +1,6 @@
+var keyOrder = [90, 88, 67, 86];
+var keyIndex = 0;
+
 var Ship = extend(Pawn, function Ship() {
 	Pawn.apply(this, arguments)
 	this.nodes = [];
@@ -11,12 +14,18 @@ var Ship = extend(Pawn, function Ship() {
 
 	this.charge = 0;
 	this.charging = false;
+
+	this.lastWinchKey = 86;
+
+	this.desiredRotation = 0;
 });
 
 Ship.prototype.NODE_DISTANCE = 64;
 Ship.prototype.MAX_SPEED = 800;
 Ship.prototype.ROPE_TENSIONING_DELAY = 1;
 Ship.prototype.GRAVITY_FUDGE_FACTOR = 2500;
+Ship.prototype.WINCH_TICK_AMOUNT = 25;
+Ship.prototype.MANUAL_ROTATION_SPEED = Math.PI/3;
 
 Ship.prototype.planet = undefined;
 
@@ -52,19 +61,31 @@ Ship.prototype.tick = function(dt) {
 			if(this.charge > 1) {
 				this.charging = false;
 				this.charge = 0;
-				//TODO: play a sound
 			}
 		}
 		else {
-			if(this.charge)
+			if(this.charge) {
 				this.fire(this.charge * this.MAX_SPEED);
+				this.chargeSound.stop();
+			}
+		}
+
+		if(this.otherPlanet) {
+			if(this.anchor.cluster && this.anchor.cluster == this.otherPlanet.cluster) {
+				this.winching = false;
+				this.otherPlanet = null;
+			}
+		} else {
+			this.anchorAngle += this.desiredRotation * dt;
 		}
 	}
 	else {
 		this.charge = 0;
 		if(this.nodes.length){
-			if(this.weAreTooFarFromThePreviousNode())
+			if(this.weAreTooFarFromThePreviousNode()) {
+				playSound(sounds.winchLettingOut);
 				this.nodes.push(new RopeSegment(game, this.x, this.y));
+			}
 		}
 
 		this.beAffectedByGravity(dt);
@@ -75,40 +96,79 @@ Ship.prototype.tick = function(dt) {
 	}
 
 	if(this.winching) {
-		var forceDirection = this.anchor.directionTo(this.otherPlanet);
-		var forceMagnitude = 10000 * dt;
-		this.anchor.addForce(PolarToRectangular(forceDirection, forceMagnitude));
-		this.otherPlanet.addForce(PolarToRectangular(forceDirection + Math.PI, forceMagnitude));
+		var currentDistance = this.anchor.distanceTo(this.otherPlanet);
+
+		var anchorAdjust = PolarToRectangular(this.anchor.directionTo(this.otherPlanet), dt * (currentDistance - this.winchLength) / 2);
+
+		this.anchor.x += anchorAdjust.x;
+		this.anchor.y += anchorAdjust.y;
+
+		this.otherPlanet.x -= anchorAdjust.x;
+		this.otherPlanet.y -= anchorAdjust.y;
 	}
 }
 
+//NOTE! This should be idempotent.
 Ship.prototype.keyHandler = function(down, keyEvent) {
-	switch(keyEvent.which || keyEvent.keyCode) {
+	var code = keyEvent.which || keyEvent.keyCode;
+	switch(code) {
 	case 32:
-		this.charging = down && this.anchor;
+		if(this.anchor && !this.otherPlanet) {
+			if(down) {
+				if(!this.charging) {
+					this.charging = true;
+					this.chargeSound = playSound(sounds.charging);
+				}
+			}
+			else
+				this.charging = false;
+		}
 		break;
+	case 37:
+			this.desiredRotation = down ?  this.MANUAL_ROTATION_SPEED : 0;
+		break;
+	case 39:
+			this.desiredRotation = down ? -this.MANUAL_ROTATION_SPEED : 0;
+		break;
+	default:
+		if(this.winching && code == keyOrder[keyIndex % 4]) {
+			playSound(sounds.winchPullingIn);
+			this.winchTick();
+			keyIndex++;
+		}
 	}
+}
+
+Ship.prototype.winchTick = function() {
+	this.winchLength -= this.WINCH_TICK_AMOUNT;
 }
 
 Ship.prototype.attachTo = function(anchor) {
 	if(this.nodes.length) {
 		this.otherPlanet = this.nodes[0].anchor;
-		this.ropeDelayRemaining = this.ROPE_TENSIONING_DELAY;
-		var toDelete = 0;
-		for(var i = 0; i < this.nodes.length; i++) {
-			if(this.nodes[i+1] && this.nodes[i+1].anchor)
-				toDelete++;
+
+		if(this.otherPlanet == anchor || ( anchor.cluster && this.otherPlanet.cluster == anchor.cluster)) {
+			this.otherPlanet = null;
+			this.destroyRope();
 		}
+		else {
+			this.ropeDelayRemaining = this.ROPE_TENSIONING_DELAY;
+			var toDelete = 0;
+			for(var i = 0; i < this.nodes.length; i++) {
+				if(this.nodes[i+1] && this.nodes[i+1].anchor)
+					toDelete++;
+			}
 
-		while(toDelete) {
-			toDelete--;
-			this.nodes.shift().destructor();
+			while(toDelete) {
+				toDelete--;
+				this.nodes.shift().destructor();
+			}
+
+			this.otherPlanet.interpAngleStart = anchor.interpAngleStart = undefined;
+
+			this.anchorRotationOffset =  anchor.directionTo(this.otherPlanet) - anchor.directionTo(this);
+			this.otherPlanetRotationOffset =  this.otherPlanet.directionTo(anchor) - this.otherPlanet.directionTo(this.nodes[0]);
 		}
-
-		this.otherPlanet.interpAngleStart = anchor.interpAngleStart = undefined;
-
-		this.anchorRotationOffset =  anchor.directionTo(this.otherPlanet) - anchor.directionTo(this);
-		this.otherPlanetRotationOffset =  this.otherPlanet.directionTo(anchor) - this.otherPlanet.directionTo(this.nodes[0]);
 	}
 	else
 		this.otherPlanet = null;
@@ -119,10 +179,10 @@ Ship.prototype.interpolateNodes = function(dt) {
 	if(this.ropeDelayRemaining < 0) {
 		this.destroyRope();
 		this.winching = true;
+		this.winchLength = this.otherPlanet.distanceTo(this.anchor);
 	}
 	for(var i = 0; i < this.nodes.length; i++) {
 		var amount = 1 - (this.ropeDelayRemaining / this.ROPE_TENSIONING_DELAY);
-		this.winching = true;
 		var targetForNode = InterpolatePositions(this.nodes[0], this, i / this.nodes.length);
 		this.nodes[i].interpolateTo(targetForNode, amount);
 		
@@ -144,6 +204,7 @@ Ship.prototype.adjustRopeInSpace = function() {
 
 		if(thisNode.anchor && thisNode.anchor != this.nodes[0].anchor) {
 			this.destroyRope();
+			playSound(sounds.ropeSnap);
 			break;
 		}
 
@@ -203,6 +264,8 @@ Ship.prototype.draw = function(dt) {
 
 	if(this.nodes.length)
 		this.drawRope(dt);
+	if(this.winching)
+		this.drawWinch(dt);
 
 	ctx.drawImageRotated(this.image, this.x, this.y, this.angle);
 
@@ -225,19 +288,40 @@ Ship.prototype.drawWheel = function(dt) {
 	
 	offset = PolarToRectangular(dir, Magnitude(offset.x, offset.y));
 
-	this.game.ctx.drawImageRotated(wheelImage, this.x + offset.x, this.y + offset.y, this.wheelAngle);
+	this.game.ctx.drawImageRotated(wheelImage, this.x + offset.x, this.y + offset.y, this.wheelAngle + this.angle);
 }
 
 Ship.prototype.drawRope = function(dt) {
 	var ctx = this.game.ctx;
 	ctx.strokeStyle = '#FFFFFF';
-	ctx.lineCap = 'roudn';
+	ctx.lineCap = 'round';
 	ctx.lineJoin = 'round';
 	ctx.lineWidth = 8;
 	ctx.beginPath();
 	this.nodes.forEach(function(n) { ctx.lineTo(n.x, n.y); });
 	ctx.lineTo(this.x, this.y);
 	ctx.stroke();
+}
+
+Ship.prototype.drawWinch = function(dt) {
+	var ctx = this.game.ctx;
+	ctx.lineWidth = 8;
+	ctx.lineCap = 'butt';
+
+	ctx.strokeStyle = 'white';
+
+	var angle, offset;
+
+	ctx.beginPath();
+		angle = this.anchor.directionTo(this.otherPlanet);
+		offset = PolarToRectangular(angle, this.anchor.radius);
+		ctx.moveTo(this.anchor.x + offset.x, this.anchor.y + offset.y);
+
+		angle += Math.PI;
+		offset = PolarToRectangular(angle, this.otherPlanet.radius);
+		ctx.lineTo(this.otherPlanet.x + offset.x, this.otherPlanet.y + offset.y);
+	ctx.stroke();
+
 }
 
 Ship.prototype.fire = function(targetVelocity) {
@@ -248,6 +332,10 @@ Ship.prototype.fire = function(targetVelocity) {
 	this.nodes.push(node);
 
 	this.detatch();
+
+	this.otherPlanet = null;
+
+	playSound(sounds.liftoff);
 
 	this.angularVelocity = 0;
 
@@ -268,6 +356,8 @@ Ship.prototype.checkForCollisions = function () {
 
 Ship.prototype.collide = function(planet) {
 	if (planet == null) return;
+
+	playSound(sounds.landing);
 
 	this.attachTo(planet);
 }
