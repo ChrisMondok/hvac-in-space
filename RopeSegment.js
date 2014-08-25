@@ -40,4 +40,26 @@ RopeSegment.prototype.collide = function(planet) {
 	if (planet == null) return;
 	this.attachTo(planet);
 }
+
+RopeSegment.prototype.destructor = function() {
+	Pawn.prototype.destructor.call(this);
+	console.log('boom');
+	for(var i=0; i<8; i++){
+		new Particle(
+				game,
+				Particle.linearFade,
+				{
+					x:this.x,
+					y:this.y
+				},
+				PolarToRectangular(Math.random() * Math.PI * 2, 5 * Math.random()),
+				.4,
+				{
+					color:'#FFFFFF',
+					radius:2
+				}
+		);
+	}
+}
+
 MixInto(RopeSegment.prototype, Attachable);

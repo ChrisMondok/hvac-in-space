@@ -267,7 +267,9 @@ Ship.prototype.draw = function(dt) {
 	if(this.winching)
 		this.drawWinch(dt);
 
-	ctx.drawImageRotated(this.image, this.x, this.y, this.angle);
+	var img = this.getImage();
+
+	ctx.drawImageRotated(img, this.x, this.y, this.angle);
 
 	ctx.lineWidth = 12;
 	ctx.strokeStyle = 'white';
@@ -277,13 +279,28 @@ Ship.prototype.draw = function(dt) {
 	ctx.stroke();
 }
 
+Ship.prototype.getImage = function() {
+	
+	if(Math.sin(this.angle) > Math.sin(Math.PI / 4))
+		return images.shipTop;
+
+	if(Math.cos(this.angle) > 0)
+		return images.shipRight;
+	else
+		return images.shipLeft;
+}
+
 Ship.prototype.drawWheel = function(dt) {
+
+	if(Math.sin(this.angle) > Math.sin(Math.PI / 4))
+		return;
+
+	if(Math.cos(this.angle) > 0)
+		var offset = {x:-13, y:-21};
+	else
+		var offset = {x:-13, y:21};
 	var wheelImage = images.wheel;
 	this.wheelAngle += (dt);
-	var offset = {
-		x:-13,
-		y:-21
-	}
 	var dir = RectangularToPolar(offset.x, offset.y) + this.angle;
 	
 	offset = PolarToRectangular(dir, Magnitude(offset.x, offset.y));
@@ -370,16 +387,17 @@ Ship.prototype.emitParticles = function(dt) {
 					game, 
 					Particle.linearFade, 
 					{
-						x:this.x - 5, 
-						y:this.y - 5
+						x:this.x, 
+						y:this.y
 					}, 
 					{
-						x:-1, 
-						y:Math.random()*.3 - 0.15
+						x:(-1 * dt * this.velocity.x/6) + Math.random()*.3 - .15, 
+						y:(-1 * dt * this.velocity.y/6) + Math.random()*.3 - .15
 					}, 
 					1,
 					{
-						color:'hsl(' + Math.floor(Math.random()*50+130) + ', 100%, 50%)'
+						color:'hsl(' + Math.floor(Math.random()*50+130) + ', 100%, 50%)',
+						radius:10
 					}
 			);
 		}
