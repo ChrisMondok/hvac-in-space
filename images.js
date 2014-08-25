@@ -22,7 +22,9 @@ var imageHandles = {
 	bluePlanet: "images/blue_planet.png",
 	redPlanet: "images/red_planet.png",
 	sun: "images/sun.png",
-	ship: "images/ship.png",
+	shipLeft: "images/ship_left.png",
+	shipRight: "images/ship_right.png",
+	shipTop: "images/ship_topdown.png",
 	background: "images/spacebg.png",
 	stars: "images/background.png",
 	wheel: "images/winch_wheel.png"

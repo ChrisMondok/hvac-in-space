@@ -199,7 +199,9 @@ Ship.prototype.draw = function(dt) {
 	if(this.nodes.length)
 		this.drawRope(dt);
 
-	ctx.drawImageRotated(this.image, this.x, this.y, this.angle);
+	var img = this.getImage();
+
+	ctx.drawImageRotated(img, this.x, this.y, this.angle);
 
 	ctx.lineWidth = 12;
 	ctx.strokeStyle = 'white';
@@ -209,18 +211,33 @@ Ship.prototype.draw = function(dt) {
 	ctx.stroke();
 }
 
+Ship.prototype.getImage = function() {
+	
+	if(Math.sin(this.angle) > Math.sin(Math.PI / 4))
+		return images.shipTop;
+
+	if(Math.cos(this.angle) > 0)
+		return images.shipRight;
+	else
+		return images.shipLeft;
+}
+
 Ship.prototype.drawWheel = function(dt) {
+
+	if(Math.sin(this.angle) > Math.sin(Math.PI / 4))
+		return;
+
+	if(Math.cos(this.angle) > 0)
+		var offset = {x:-13, y:-21};
+	else
+		var offset = {x:-13, y:21};
 	var wheelImage = images.wheel;
 	this.wheelAngle += (dt);
-	var offset = {
-		x:-13,
-		y:-21
-	}
 	var dir = RectangularToPolar(offset.x, offset.y) + this.angle;
 	
 	offset = PolarToRectangular(dir, Magnitude(offset.x, offset.y));
 
-	this.game.ctx.drawImageRotated(wheelImage, this.x + offset.x, this.y + offset.y, this.wheelAngle);
+	this.game.ctx.drawImageRotated(wheelImage, this.x + offset.x, this.y + offset.y, this.wheelAngle + this.angle);
 }
 
 Ship.prototype.drawRope = function(dt) {
@@ -275,12 +292,12 @@ Ship.prototype.emitParticles = function(dt) {
 					game, 
 					Particle.linearFade, 
 					{
-						x:this.x - 5, 
-						y:this.y - 5
+						x:this.x, 
+						y:this.y
 					}, 
 					{
-						x:-1, 
-						y:Math.random()*.3 - 0.15
+						x:(-1 * this.velocity.x/6) + Math.random()*.3 - .15, 
+						y:(-1 * this.velocity.y/6) + Math.random()*.3 - .15
 					}, 
 					1,
 					{

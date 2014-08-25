@@ -77,6 +77,7 @@ function ParticleGeneratorTest() {
 	};
 
 	ship.velocity = {x:50, y:0};
+	return ship;
 }
 
 
