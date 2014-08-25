@@ -67,9 +67,9 @@ Game.prototype.startMusic = function() {
 
 	this.winchingGainNode.gain.value = 0;
 
-//	this.guitars.start(0);
-//	this.notWinchingDrums.start(0);
-//	this.winchingDrums.start(0);
+	this.guitars.start(0);
+	this.notWinchingDrums.start(0);
+	this.winchingDrums.start(0);
 }
 
 Game.prototype.timeScale = 1;
