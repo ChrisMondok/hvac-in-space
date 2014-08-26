@@ -11,6 +11,9 @@ var level1 = function(){
 		if(!this.victory){
 			alert('Hoo boy you won!');
 			this.victory = true;
+			game.destructor();
+			goToState('title');
+			game.over = true;
 		}
 	};
 	game.loss = false;
@@ -18,6 +21,9 @@ var level1 = function(){
 		if(!this.loss){
 			alert('You succumbed to the cold vaccuum of space :(');
 			this.loss = true;
+			game.destructor();
+			goToState('title');
+			game.over = true;
 		}
 	}
 	return game;
@@ -39,6 +45,9 @@ var level2 = function(){
 		if(!this.victory){
 			alert('Hoo boy you won!');
 			this.victory = true;
+			game.destructor();
+			goToState('title');
+			game.over = true;
 		}
 	};
 	game.loss = false;
@@ -46,6 +55,9 @@ var level2 = function(){
 		if(!this.loss){
 			alert('You succumbed to the cold vaccuum of space :(');
 			this.loss = true;
+			game.destructor();
+			goToState('title');
+			game.over = true;
 		}
 	}
 	return game;
@@ -69,6 +81,9 @@ var level3 = function(){
 		if(!this.victory){
 			alert('Hoo boy you won!');
 			this.victory = true;
+			game.destructor();
+			goToState('title');
+			game.over = true;
 		}
 	};
 	game.loss = false;
@@ -76,6 +91,9 @@ var level3 = function(){
 		if(!this.loss){
 			alert('You succumbed to the cold vaccuum of space :(');
 			this.loss = true;
+			game.destructor();
+			goToState('title');
+			game.over = true;
 		}
 	}
 

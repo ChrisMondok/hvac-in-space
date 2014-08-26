@@ -7,13 +7,15 @@ function init() {
 
 function startGame(level) {
 	//var game = window.game = new Game();
-	var game = window.game = level3();
+	var game = window.game = level;
 
 	function main() {
-		if(game) {
+		if(game && !game.over) {
 			game.tick();
 			requestAnimationFrame(main);
 		}
+		else
+			console.log("Game is over");
 	}
 
 	main();

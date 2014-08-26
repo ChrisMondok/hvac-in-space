@@ -18,9 +18,19 @@ function loadedAThing() {
 		document.getElementById('loadingbars').style.display = 'none';
 		goToState('title');
 
-		document.getElementById('play-game-button').addEventListener('click', function() {
+		document.getElementById('level-one').addEventListener('click', function() {
 			goToState('game');
-			startALevel(null);
+			startGame(level1());
+		});
+
+		document.getElementById('level-two').addEventListener('click', function() {
+			goToState('game');
+			startGame(level2());
+		});
+
+		document.getElementById('level-three').addEventListener('click', function() {
+			goToState('game');
+			startGame(level3());
 		});
 
 		document.getElementById('instructions-button').addEventListener('click', function() {
