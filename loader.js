@@ -33,6 +33,11 @@ function loadedAThing() {
 			startGame(level3());
 		});
 
+		document.getElementById('level-four').addEventListener('click', function() {
+			goToState('game');
+			startGame(level4());
+		});
+
 		document.getElementById('instructions-button').addEventListener('click', function() {
 			doInstructions();
 		});
