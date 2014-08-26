@@ -5,8 +5,18 @@
 	function gotImage(i) {
 		toload.splice(toload.indexOf(i), 1);
 		document.getElementById('image-meter').value = 1-(toload.length / Object.keys(imageHandles).length);
-		if(!toload.length)
+		if(!toload.length) {
 			document.dispatchEvent(new CustomEvent("imagesloaded"));
+				Planet.images = [
+				images.bluePlanet,
+				images.redPlanet,
+				images.earthishPlanet,
+				images.geenPlanet,
+				images.pinkPlanet,
+				images.pinkgreenPlanet,
+				images.puplePlanet
+			];
+		}
 	}
 
 	scope.loadImage = function(name, url) {
@@ -22,6 +32,11 @@
 var imageHandles = {
 	bluePlanet: "images/blue_planet.png",
 	redPlanet: "images/red_planet.png",
+	earthishPlanet: "images/earthish_planet.png",
+	geenPlanet: "images/geen_planet.png",
+	pinkPlanet: "images/pink_planet.png",
+	pinkgreenPlanet: "images/pinkgreen_planet.png",
+	puplePlanet: "images/puple_planet.png",
 	sun: "images/sun.png",
 	shipLeft: "images/ship_left.png",
 	shipRight: "images/ship_right.png",

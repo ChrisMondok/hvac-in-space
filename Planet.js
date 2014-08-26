@@ -1,4 +1,8 @@
-var Planet = extend(Pawn, function Planet() {Pawn.apply(this, arguments)});
+var Planet = extend(Pawn, function Planet() {
+	Pawn.apply(this, arguments);
+	this.image = Planet.images[Math.floor(Math.random() * Planet.images.length)];
+});
+
 
 Planet.prototype.mass = 1000;
 
