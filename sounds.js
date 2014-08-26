@@ -41,13 +41,13 @@
 		storyTime: "sounds/storytime.ogg",
 
 		/* In-game tracks */
-		guitar: "sounds/sleepy guitars only.ogg",
+		guitar: "sounds/sleepy-guitars.ogg",
 		smallDrums: "sounds/sleepy only smaller drums.ogg",
 		drumsAndBass: "sounds/sleepy only bass and bigger drums.ogg",
 
 		/* SFX */
 		charging: "sounds/sfx/charging.ogg",
-		getAwayFromTheDamnSun: "sounds/sfx/get-away-from-the-damn-sun.ogg",
+		getAwayFromTheDamnSun: "sounds/sfx/damn-sun.ogg",
 		landing: "sounds/sfx/landing.ogg",
 		liftoff: "sounds/sfx/liftoff.ogg",
 		planetsCollide: "sounds/sfx/planets-collide.ogg",
@@ -58,6 +58,7 @@
 		winchLettingOut: "sounds/sfx/winch-letting-out.ogg",
 		winchPullingIn: "sounds/sfx/winch-pulling-in.ogg",
 		powerUp: "sounds/sfx/powering uuuuup.ogg",
+		sundive: "sounds/sfx/sundive.ogg",
 
 		/* Winch sfx */
 		winch1: "sounds/sfx/winch 1.ogg",
