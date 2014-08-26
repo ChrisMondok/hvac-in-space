@@ -27,7 +27,7 @@
 	<link rel="stylesheet" href="style.css"/>
 </head>
 <body>
-	<section id="loadingbars">
+	<div id="loadingbars">
 		<div>
 			Images:
 			<meter id="image-meter" min="0" max="1" value="0"></meter>
@@ -36,12 +36,54 @@
 			Sounds: 
 			<meter id="audio-meter" min="0" max="1" value="0"></meter>
 		</div>
-	</section>
-	<section id="menu" style="display: none">
-		<button>Introduction</button>
+	</div>
+	<section id="menu">
+		<button id="instructions-button">Instructions</button>
 		<button id="play-game-button">Play Game</button>
 	</section>
-	<section id="introduction">
+	<section id="instructions">
+		<figure>
+			<img src="images/cinematic_1.png"/>
+			<img src="images/cinematic_2.png"/>
+			<caption>
+				We here at the CAC know that you must be very excited to begin your first day as a Tethercraft Operator. What follows is a brief reintroduction to the methods and expectations associated with your position here at CAC, Inc.			
+			</caption>
+			<br/>
+			<button id="next-button">Next</button>
+		</figure>
+		<figure>
+			<img src="images/cinematic_3.png"/>
+			<img src="images/cinematic_4.png"/>
+			<img src="images/cinematic_5.png"/>
+			<img src="images/cinematic_6.png"/>
+			<p>
+			As you know from your training materials and intensive two-week training camp, your mission as a CAC Level 1 Planet Collector is to gather the planets located in the designated celestial real estate specified by our client. Today’s client is <span id="companyName"></span>. All planets in the <span id="sectorName"></span> must be collected using the Tethercraft Collection Method before the end of one (1) business day. See above graphic for reminders on the Method.
+			</p>
+
+			<p>
+			Should you overshoot a planet and fail to land, your Tethercraft may experience an extreme gravitational imbalance, which has a 99.99% chance of full system failure, leaving your craft sailing forever into the cold vacuum of space.
+			</p>
+
+			<p>
+			We here at the CAC know how much you want to avoid such loss of property!
+			</p>
+
+			<p>
+			We know how excited you are to get to work, so we won’t keep you any longer. Just remember: you are a pilot representing the whole of the Celestial Assembly Corporation and our dedication to our customers. Your untimely death would be extremely unfortunate for our business timetable. Work hard, work quickly, and attempt to avoid certain annihilation. 
+			</p>
+
+			<p>
+			We are rooting for you!
+			</p>
+
+			<p>
+			Your friends at Celestial Assembly Corporation, Inc
+			</p>
+
+			<br/>
+			<button id="menu-button">Menu</button>
+		</figure>
+
 	</section>
 </body>
 </html>
