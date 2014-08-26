@@ -5,8 +5,9 @@ function init() {
 
 }
 
-function startGame() {
-	var game = window.game = new Game();
+function startGame(level) {
+	//var game = window.game = new Game();
+	var game = window.game = level3();
 
 	function main() {
 		if(game) {

@@ -23,5 +23,5 @@ function loadedAThing() {
 function startALevel(level) {
 	_titleScreenMusic.stop();
 	_titleScreenMusic = null;
-	startGame();
+	startGame(level);
 }

@@ -1,12 +1,14 @@
 var Zone = extend(Pawn, function Zone() {
 	Pawn.apply(this, arguments);
-	console.log("go");
 	this.planets = [];
 
 });
 
 Zone.prototype.radius = 500;
 Zone.prototype.radiusFactor = 10;
+
+Zone.prototype.ship = undefined;
+Zone.prototype.shipOutsideZone = 1000;
 
 Zone.prototype.recenter = function() {
 	var x = 0;
@@ -72,9 +74,8 @@ Zone.prototype.allInACLuster = function() {
 
 		if(firstCluster == undefined)
 			return false;
-
-		return true;
 	}
+	return true;
 }
 
 Zone.prototype.tick = function(dt) {
@@ -82,6 +83,10 @@ Zone.prototype.tick = function(dt) {
 	Pawn.prototype.tick.call(this,dt);
 
 	this.recenter();
+
+	if((this.shipOutsideZone + this.radius) < this.distanceTo(this.ship))
+		this.game.lose();
+	
 
 	var escapedPlanets = [];
 	this.planets.forEach( function(planet) {
@@ -96,7 +101,6 @@ Zone.prototype.tick = function(dt) {
 	},this);
 
 	if (this.allInACLuster()){
-		console.log("You win!");
 		this.game.win()
 	}
 }
