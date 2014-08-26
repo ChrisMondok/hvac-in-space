@@ -38,6 +38,8 @@ Game.prototype.keyHandler = function(keyEvent) {
 		this.screenScale = Math.min(this.screenScale + 0.1, 1);
 	if(code == 45) //minus
 		this.screenScale = Math.max(this.screenScale - 0.1, 0.1)
+
+	keyEvent.preventDefault();
 }
 
 Game.prototype.startMusic = function() {
