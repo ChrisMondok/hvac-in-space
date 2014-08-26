@@ -31,8 +31,11 @@ section {
 
 img {
 	max-width: 100%;
-	display: none;
 	margin: 0 auto;
+}
+
+figure img {
+	display: none;
 }
 
 .a img:nth-of-type(1) {
