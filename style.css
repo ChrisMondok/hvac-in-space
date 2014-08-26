@@ -1,0 +1,55 @@
+html, body {
+	margin: 0;
+	padding: 0;
+	font-family:"ChunkFive";
+	background-color: black;
+	color: white;
+}
+canvas {
+	position: absolute;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+}
+@font-face {
+	font-family:"ChunkFive";
+	src:url("fonts/ChunkFive/Chunkfive.otf");
+}
+
+section {
+	display: none;
+}
+
+.title #menu {
+	display: block;
+}
+
+.instructions #instructions {
+	display: block;
+}
+
+img {
+	max-width: 100%;
+	display: none;
+	margin: 0 auto;
+}
+
+.a img:nth-of-type(1) {
+	display: block;
+}
+.b img:nth-of-type(2) {
+	display: block;
+}
+.c img:nth-of-type(3) {
+	display: block;
+}
+.d img:nth-of-type(4) {
+	display: block;
+}
+.e img:nth-of-type(5) {
+	display: block;
+}
+.f img:nth-of-type(6) {
+	display: block;
+}
