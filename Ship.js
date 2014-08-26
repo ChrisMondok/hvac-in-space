@@ -437,6 +437,7 @@ Ship.prototype.collide = function(planet) {
 
 	if(planet instanceof Star) {
 		this.destructor();
+		this.game.lose();
 	}
 	else {
 		playSound(sounds.landing);
